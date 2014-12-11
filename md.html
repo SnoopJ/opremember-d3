@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+path {
+//  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 0.5px;
+}
+
+path:hover {
+  fill: black;
+}
+
+.name {
+  fill: red;
+  stroke: black;
+}
+
+.name:hover {
+  fill: blue;
+  stroke: black;
+}
+
+svg {
+//  background-color: #eeeeee;
+}
+
+//.county24005 { fill: blue; }
+
+</style>
+<body>
+<button onClick="colorTransition()">click to transition colors</button>
+<span id="curr"></span>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+var width = 960,
+    height = 900;
+
+var defaulttext = "Mouse over a county or personnel node to see its name"
+d3.select("#curr").text(defaulttext)
+
+var projection = d3.geo.mercator()
+    .center([-77,37+50/60])
+//    .translate([-width/2,height/2])
+//    .center([-77,38])
+    //.rotate([74 + 30 / 60, -38])
+    //.parallels([76,78])
+    .scale(10000)
+    .translate([width/2,height/2])
+
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("g").attr("id", "map")
+svg.append("g").attr("id", "names")
+
+var g;
+d3.json("md.json", function(error, md) {
+  g = md;
+  console.log(g)
+
+  svg.select("#map").selectAll("path")
+	.data(md.features)
+           .enter()
+	   .append("g")
+	   .attr("id", function(d) { return "county"+d.properties.CNTY2010.substr(2,3) })
+           .append("path")
+           .attr("d", path)
+	   .attr("fill", function(){ return "hsl(" + (46+Math.random()*35) + ","+(50+(Math.random()*10-5))+"%,45%)"})
+	   .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
+           .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
+  console.log("You should see the data now...")
+}
+
+);
+
+d3.json("personnel.json", function(e,json) {
+	console.log(json)
+	svg.select("#names").selectAll("c")
+		.data(json)
+		.enter()
+//		.append("text")
+		.append("circle")
+		.attr("class", "name")
+		.attr("r",5)
+		.attr("transform", function(d) {return "translate("+ projection([d.latitude,d.longitude])+")"})
+		.on("mouseover",function(d){ d3.select("#curr").text(d.name) })
+	        .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
+})
+
+function colorTransition() { d3.selectAll("path").transition().attr("fill", function(){ return "hsl(" + (46+Math.random()*55) + ","+(50+(Math.random()*20-10))+"%,45%)"}).duration(1000) }
+d3.select(self.frameElement).style("height", height + "px");
+
+d3.csv("MD-pop-data.csv", function(d) { 
+	csvdata=d; 
+	d.forEach(function(dt){console.log(dt.GEOID - 2400000)})
+})
+</script>
+</body>
