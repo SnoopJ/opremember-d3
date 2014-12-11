@@ -49,9 +49,15 @@ var projection = d3.geo.mercator()
 var path = d3.geo.path()
     .projection(projection);
 
-var svg = d3.select("body").append("svg")
+var div = d3.select("body")
+	.append("div")
+	.attr("width", width)
+        .attr("height", height)
+    	.attr("position", "absolute")
+
+var svg = div.append("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
 
 svg.append("g").attr("id", "map")
 svg.append("g").attr("id", "names")
@@ -71,7 +77,7 @@ d3.json("md.json", function(error, md) {
            .attr("d", path)
 	   .attr("fill", function(){ return "hsl(" + (46+Math.random()*35) + ","+(50+(Math.random()*10-5))+"%,45%)"})
 	   .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
-           //.on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
+           .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
   console.log("You should see the data now...")
 }
 
@@ -88,7 +94,7 @@ d3.json("personnel.json", function(e,json) {
 		.attr("r",5)
 		.attr("transform", function(d) {return "translate("+ projection([d.latitude,d.longitude])+")"})
 		.on("mouseover",function(d){ d3.select("#curr").text(d.name) })
-	        //.on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
+	        .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
 })
 
 function colorTransition() { d3.selectAll("path").transition().attr("fill", function(){ return "hsl(" + (46+Math.random()*55) + ","+(50+(Math.random()*20-10))+"%,45%)"}).duration(1000) }
