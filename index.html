@@ -71,7 +71,7 @@ d3.json("md.json", function(error, md) {
            .attr("d", path)
 	   .attr("fill", function(){ return "hsl(" + (46+Math.random()*35) + ","+(50+(Math.random()*10-5))+"%,45%)"})
 	   .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
-           .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
+           //.on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
   console.log("You should see the data now...")
 }
 
@@ -88,7 +88,7 @@ d3.json("personnel.json", function(e,json) {
 		.attr("r",5)
 		.attr("transform", function(d) {return "translate("+ projection([d.latitude,d.longitude])+")"})
 		.on("mouseover",function(d){ d3.select("#curr").text(d.name) })
-	        .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
+	        //.on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
 })
 
 function colorTransition() { d3.selectAll("path").transition().attr("fill", function(){ return "hsl(" + (46+Math.random()*55) + ","+(50+(Math.random()*20-10))+"%,45%)"}).duration(1000) }
