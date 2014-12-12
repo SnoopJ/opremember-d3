@@ -9,7 +9,7 @@ path {
 }
 
 path:hover {
-  fill: black;
+//  fill: black;
 }
 
 .name {
@@ -44,7 +44,7 @@ d3.select("#curr").text(defaulttext)
 var projection = d3.geo.mercator()
     .center([-77,37+50/60])
     .scale(10000)
-    .translate([width/2,height/2])
+    .translate([width/2,height*0.6])
 
 var path = d3.geo.path()
     .projection(projection);
@@ -71,6 +71,8 @@ d3.json("md.json", function(error, md) {
 	.data(md.features)
            .enter()
 	   .append("g")
+	   .attr("class", "countygeom")
+	   .attr("zoom", 1)
 	   .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
            .append("path")
 	   .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
@@ -79,9 +81,30 @@ d3.json("md.json", function(error, md) {
 	   .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
            .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
   console.log("You should see the data now...")
-}
 
-);
+	d3.selectAll("g.countygeom")
+		.on('click',function(d) {
+		  this.parentNode.appendChild(this)
+		  t = d3.select(this)
+		  c = path.centroid(d)
+		  zoomed = (t.attr("zoom") == 1)
+ 		  c.x = (zoomed? (1-4)*c[0] : 0)
+		  c.y = (zoomed? (1-4)*c[1] : 0)
+		  col = function(){ return "hsl(" + (46+Math.random()*55) + ","+(50+(Math.random()*20-10))+"%,45%)"}
+		  t.select("path").transition().duration(500).attr("fill",zoomed? "black" : col )
+		  t.attr("zoom", (zoomed? 4 : 1))
+		  .transition()
+		  .duration(500)
+		  .attr("transform",
+			"translate(" + c.x + "," + c.y +")scale(" + t.attr("zoom") +")"
+			)
+		  console.log(this)
+ 		} )
+});
+
+function zoom(obj,scale,trans) {
+  obj.transition().duration(400).attr("transform", "translate(" + trans + ")scale(" + scale + ")");
+}
 
 d3.json("personnel.json", function(e,json) {
 	console.log(json)
