@@ -71,17 +71,17 @@ for rec in indb:
 
     initRec(rec)
 
+    if rec.recid in outdb:
+        warning("Duplicate record ID ({0}), skipping".format(rec.recid))
+        continue
+
     rec.fname = getTag(rec,"FNAME")
     rec.lname = getTag(rec,"LNAME")
     photo = getPhoto(rec)
     rec.hometown = getTag(rec,"HOME")
     rec.county = getTag(rec,"COUNTY")
 
-    if rec.recid in outdb:
-        warning("Duplicate record ID ({0}), skipping".format(rec.recid))
-        continue
-    else:
-        outdb[rec.recid] = OrderedDict([
+    outdb[rec.recid] = OrderedDict([
         ('fname',rec.fname)
         ,('lname',rec.lname) 
         ,('hasphoto',rec.hasphoto)
