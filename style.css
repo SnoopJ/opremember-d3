@@ -1,0 +1,28 @@
+
+path {
+//  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 0.5px;
+}
+
+path:hover {
+//  fill: black;
+}
+
+.name {
+  fill: red;
+  stroke: black;
+}
+
+.name:hover {
+  fill: blue;
+  stroke: black;
+}
+
+svg {
+//  background-color: #eeeeee;
+}
+
+//.county24005 { fill: blue; }
+
+
