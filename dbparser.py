@@ -100,10 +100,18 @@ for rec in indb:
     rec.county = getTag(rec,"COUNTY")
     
     rec.hometown = getTag(rec,"HOME")
+    rec.latitude = -77
+    rec.longitude = 39
     if rec.hometown is not None:
         loc = getLocation(rec.hometown)
         if len(loc) > 0:
-            print("Hometown (%s) successfully recovered! (recid %s)"% (rec.hometown,rec.recid))
+            print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
+            info = (loc[0]).split("\t")
+            lat = float(info[4])
+            lng = float(info[5])
+            print("(Lat,Long) should be (%f,%f)" % (lat,lng))
+            rec.latitude = lat
+            rec.longitude = lng
         else:
             print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
 	
@@ -112,7 +120,6 @@ for rec in indb:
 	ht = geolocator.geocode(rec.hometown, timeout=30)
     except:
 	print("Error: geocode failed")	
-    '''
     ht = None
     if ht is not None:
 	rec.latitude = ht.latitude
@@ -120,6 +127,7 @@ for rec in indb:
     else:
 	rec.latitude = -77
 	rec.longitude = 39
+    '''
 
     outfile = file('json/'+str(rec.recid)+".json",'w')
     outrec = OrderedDict( [
