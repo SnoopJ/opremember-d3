@@ -1,4 +1,6 @@
-[{"fname": "ROBERT LEROY", "lname": "WILLARD", "hasphoto": true, "photo": null, "hometown": " FREDERICK", "latitude": 39.294, "longitude": -76.59636, "county": "FREDERICK"},
+[
+{"fname": "Fake", "lname": "Person", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "Baltimore city"},
+{"fname": "ROBERT LEROY", "lname": "WILLARD", "hasphoto": true, "photo": null, "hometown": " FREDERICK", "latitude": 39.294, "longitude": -76.59636, "county": "FREDERICK"},
 {"fname": "CHARLES", "lname": "WILLIAMS", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY"},
 {"fname": "RAYNER EDWARD", "lname": "WILLIAMS", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY"},
 {"fname": "SAMUEL LOUIS JR", "lname": "WILLIAMS", "hasphoto": true, "photo": null, "hometown": " LAUREL", "latitude": 39.09928, "longitude": -76.84831, "county": "PRINCE GEORGES"},
