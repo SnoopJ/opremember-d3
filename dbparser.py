@@ -12,17 +12,15 @@ import json
 from base64 import b64decode
 from collections import OrderedDict
 import re
-#from geopy.geocoders import Nominatim
-#from geopy.exc import GeocoderTimedOut
-#geolocator = Nominatim()
+
+DOPHOTOS = False
+if not DOPHOTOS:
+    print("Skipping photo processing...")
 
 tree = ET.parse('./ormvmasterfile.xml')
 indb = tree.getroot()
 
 outdb = OrderedDict()
-#outdb = []
-#outfile = file("ormvdb.json",'w')
-#print("[",file=outfile)
 
 imgdir = 'img'
 
@@ -41,8 +39,7 @@ def getPhoto(rec):
 
     photo = rec.find("photo_x0020_attachments")
 
-    doPhotos = False
-    if doPhotos :
+    if DOPHOTOS :
         if photo is None :
             print("INFO: Record " + str(rec.recid) + " has a photo listed, but no photo is present in the database.")
             return None
@@ -50,14 +47,13 @@ def getPhoto(rec):
             if not os.path.exists(imgdir):
                 os.makedirs(imgdir)
             
-            #print("DEBUG: trying to decode "+str(photo.text))
             try :
                 p = b64decode(photo.find("FileData").text.replace("\n","").replace("\r",""))
+                # TODO(?): sanity check here, not all extensions are 3 letters...
                 ext = '.' + p[12:18:2]
                 print("DEBUG: header is "+str(ext))
                 p = p[20:]
-                # must skip 20 bytes of MS header...
-                # TODO: consume these bytes and determine appropriate file extension
+                # MS reserves 20 bytes for...who the hell knows.
                 fn = str(rec.recid)+ext
                 f = file(imgdir+"/"+fn,'wb')
                 print(p,file=f)
@@ -66,6 +62,7 @@ def getPhoto(rec):
             except :
                 warning("Could not decode photo for record " + str(rec.recid))
                 return None
+
 
 def getTag(rec,tag):
     t  = rec.find(tag)
@@ -82,8 +79,8 @@ def getLocation(name):
     r = re.compile("^[^\t]+\t"+re.escape(name.lstrip()),re.IGNORECASE)
     res = []
     for p in places:
-	if r.search(p) is not None:
-		res.append(p)
+	    if r.search(p) is not None:
+		    res.append(p)
     return res
 
 # XML is gross.
@@ -115,23 +112,10 @@ for rec in indb:
         else:
             print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
 	
-    '''
-    try:
-	ht = geolocator.geocode(rec.hometown, timeout=30)
-    except:
-	print("Error: geocode failed")	
-    ht = None
-    if ht is not None:
-	rec.latitude = ht.latitude
-    	rec.longitude = ht.longitude
-    else:
-	rec.latitude = -77
-	rec.longitude = 39
-    '''
-
     outfile = file('json/'+str(rec.recid)+".json",'w')
     outrec = OrderedDict( [
-        ('fname',rec.fname)
+        ('recid',rec.recid)
+        ,('fname',rec.fname)
         ,('lname',rec.lname) 
         ,('hasphoto',rec.hasphoto)
         ,('photo',photo)
@@ -141,7 +125,6 @@ for rec in indb:
         ,('county',rec.county) ] )
     outdb[rec.recid] = outrec
     print(json.dumps(outrec), file=outfile)
-    #print(',', file=outfile)
     outfile.close()
     
 #print(json.dumps(outdb),file=outfile)
