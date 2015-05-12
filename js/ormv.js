@@ -31,60 +31,52 @@ var g;
 d3.json("md.json", function(error, md) {
   g = md;
 
-  svg.select("#map").selectAll("path")
-	//.data(md.features,getCounty)
+  svg
+    //.select("#map")
+    .selectAll("path")
 	.data(md.features)
            .enter()
 	   .append("g")
+        // create a sibling under #names which will hold personnel nodes
+       .each(function(d){ 
+            svg.append("g")
+            .attr("class", "names")
+            .attr("countyid", d.properties.CNTY00) 
+       } )
 	   .attr("class", "countygeom")
 	   .attr("zoom", 1)
 	   .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
-           .append("path")
-	   .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
-           .attr("d", path)
+       .append("path")
+	   //.attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
+       .attr("d", path)
 	   .attr("fill", "hsl(81,50%,45%)")
 	   .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
            .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
 
 	d3.selectAll("g.countygeom")
 		.on('click',function(d) {
-		  this.parentNode.appendChild(this)
-		  t = d3.select(this)
-          exposedvar = t
+          t = d3.select(this)
+          cty = t.attr("countyid")
+          // select this element and its name container sibling
+		  t.push( d3.selectAll(".names[countyid=\""+cty+"\"]")[0] )
 		  c = path.centroid(d)
 		  zoomed = (t.attr("zoom") == 1)
  		  c.x = (zoomed? (1-4)*c[0] : 0)
 		  c.y = (zoomed? (1-4)*c[1] : 0)
+		  //t.attr("zoom", (zoomed? 4 : 1))
+          t.each( function() { this.parentNode.appendChild(this) } )
 		  t.attr("zoom", (zoomed? 4 : 1))
 		  .transition()
 		  .duration(500)
 		  .attr("transform",
 			"translate(" + c.x + "," + c.y +")scale(" + t.attr("zoom") +")"
 			)
+        // TODO: animation finished, do some z-index cleanup?
  		} )
 });
 
 function zoom(obj,scale,trans) {
   obj.transition().duration(400).attr("transform", "translate(" + trans + ")scale(" + scale + ")");
-}
-
-function getCounty(d,i) {
-    console.log("searching "+d+" for key "+ i)
-    console.log(d)
-    console.log(this)
-    if (d.hasOwnProperty("countyid")) {
-        console.log("casualty datum returning " + d.countyid)
-        return d.countyid
-    }
-    
-    console.log("fell through casualty...")
-    if (d.properties.hasOwnProperty("CNTY00")) {
-        console.log("county datum returning " + d.properties.CNTY00)
-        return d.properties.CNTY00
-    }
-    
-    console.log("Can't get any county id!")
-    return
 }
 
 function sortDataByCounty( data ) {
@@ -109,10 +101,10 @@ function getCasualties() {
 
 d3.json("ormvdb.json", function(e,json) {
     casualtiesbycounty = sortDataByCounty(json);
-	svg.select("#map")
-        .selectAll("g")
-        //.selectAll("circle")
-        //.enter()
+	//svg.select("#map")
+	svg
+        //.select("#names")
+        .selectAll(".names")
         .selectAll("circle")
         .data(getCasualties)
         .enter()
@@ -126,7 +118,6 @@ d3.json("ormvdb.json", function(e,json) {
             x=proj[0]
             y=proj[1]
             return "translate("+ x +"," + y + ")"
-            return "translate(0,0)"
         })
 		.on("mouseover",function(d){ d3.select("#curr").text(d.lname + ", " + d.fname + "  ; HOMETOWN: " + d.hometown + " (county: " + d.county + " )" ) })
 	        .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
