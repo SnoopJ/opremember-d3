@@ -14,15 +14,16 @@ path:hover {
   stroke: black;
 }
 
+.infobox {
+  position: absolute;
+  background-color: rgba(73, 72, 129, 0.85);
+}
+
+.infobox > p {
+  margin: 10px; 
+}
+
 .name:hover {
   fill: blue;
   stroke: black;
 }
-
-svg {
-//  background-color: #eeeeee;
-}
-
-//.county24005 { fill: blue; }
-
-
