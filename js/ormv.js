@@ -120,6 +120,10 @@ function sortDataByCounty( data ) {
         .enter()
         .append("p")
         .text(function(d) { return "Casualty: " + d.fname + " " + d.lname } )
+        .append("img").attr("src",function(d) { 
+            if (!d.hasphoto) { return "" }
+            return "img/"+d.recid+".png" 
+        })
     return ret
 }
 
@@ -155,7 +159,17 @@ d3.json("ormvdb.json", function(e,json) {
 	    .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
 	    .on("click", function(d,i) { 
             d3.selectAll(".infobox").style("visibility", "hidden") 
-            d3.select("#infobox"+d.countyid).style("visibility", "visible") 
+            infobox = d3.select("#infobox"+d.countyid)
+            infobox.style("visibility", "visible") 
+            // TODO: does not take parent's transform into account
+            pos = d3.transform( d3.select(this).attr("transform") ).translate
+            infobox.style({
+                "left": pos[0]+20+"px", 
+                "top": pos[1]+30+"px"
+            }) 
+            infobox.transition().duration(100)
+           // .ease("elastic", 100, 10)
+            .style({"left": pos[0]+"px", "top": pos[1]+"px"}) 
         })
 })
 

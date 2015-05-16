@@ -3,9 +3,9 @@
 {"recid": 21, "fname": "FRANCIS MATTHEW", "lname": "AUD", "hasphoto": true, "photo": null, "hometown": " GREAT MILLS", "latitude": 38.23679, "longitude": -76.49718, "county": "SAINT MARYS", "countyid" : "037" }
 ,{"recid": 5, "fname": "HARVEY CHADWICK", "lname": "AIAU", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY", "countyid": "510" }
 ,{"recid": 521, "fname": "DONALD JAY", "lname": "FISHER", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY", "countyid": "510"}
-,{"recid": 123, "fname": "FAKE", "lname": "RECORD", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY", "countyid": "510"}
-,{"recid": 124, "fname": "FAKE", "lname": "RECORD 2", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY", "countyid": "510"}
 ,{"recid": 123, "fname": "JOSEPH KENNETH", "lname": "CARROLL", "hasphoto": true, "photo": null, "hometown": " BRYANS ROAD", "latitude": 38.62706, "longitude": -77.07303, "county": "CHARLES", "countyid" : "017"}
 ,{"recid": 806, "fname": "CLIFTON DOUGLAS", "lname": "ROY", "hasphoto": true, "photo": null, "hometown": " WOODLAWN", "latitude": 39.32288, "longitude": -76.72803, "county": "PRINCE GEORGES", "countyid" : "033"}
 
+,{"recid": 1111, "fname": "FAKE", "lname": "RECORD", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY", "countyid": "510"}
+,{"recid": 1112, "fname": "FAKE", "lname": "RECORD 2", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.23316, "longitude": -76.63663, "county": "BALTIMORE CITY", "countyid": "510"}
 ]
