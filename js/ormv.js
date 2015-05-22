@@ -1,3 +1,4 @@
+var remaining = 2; // Global var to trigger post-load processing
 var exposedvar;
 
 var width = 960,
@@ -32,6 +33,7 @@ var g;
 d3.json("md.json", function(error, md) {
   g = md;
 
+  console.log("processing county geometry");
   svg
     //.select("#map")
     .selectAll("path")
@@ -79,6 +81,8 @@ d3.json("md.json", function(error, md) {
             d3.selectAll(".names").each( function() { this.parentNode.appendChild(this) } )
           } } )
  		} )
+console.log("done processing counties")
+  if(!--remaining) doCasualties();
 });
 
 function zoom(obj,scale,trans) {
@@ -138,7 +142,17 @@ function getCasualties() {
 }
 
 d3.json("ormvdb.json", function(e,json) {
-    casualtiesbycounty = sortDataByCounty(json);
+    casualtyjson = json; 
+    if(!--remaining) {
+        console.log(remaining);
+        doCasualties();
+    }
+})
+
+function doCasualties() {
+    console.log("entering doCasualties(), remaining is "+remaining)
+    casualtiesbycounty = sortDataByCounty(casualtyjson);
+    console.log("casualty data processed")
     // casualty circles
 	svg.selectAll(".names")
         .selectAll("circle")
@@ -171,7 +185,7 @@ d3.json("ormvdb.json", function(e,json) {
            // .ease("elastic", 100, 10)
             .style({"left": pos[0]+"px", "top": pos[1]+"px"}) 
         })
-})
+}
 
 d3.select(self.frameElement).style("height", height + "px");
 
