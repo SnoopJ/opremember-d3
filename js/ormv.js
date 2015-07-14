@@ -26,61 +26,29 @@ var svg = div.append("svg")
     .attr("width", width)
     .attr("height", height)
 
-//svg.append("g").attr("id", "map")
-//svg.append("g").attr("id", "names")
-
 var g;
 d3.json("md.json", function(error, md) {
   g = md;
 
   console.log("processing county geometry");
-  svg
-    //.select("#map")
-    .selectAll("path")
-	.data(md.features)
-           .enter()
-	   .append("g")
-        // create a sibling under #names which will hold personnel nodes
-       .each(function(d){ 
-            svg.append("g")
-            .attr("class", "names")
-            .attr("countyid", d.properties.CNTY00) 
-       } )
-	   .attr("class", "countygeom")
-	   .attr("zoom", 1)
-	   .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
-       .append("path")
-	   //.attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
-       .attr("d", path)
-	   .attr("fill", "hsl(81,50%,45%)")
-	   .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
-           .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
+  svg.selectAll("path")
+    .data(md.features)
+    .enter()
+    .append("g")
+    // create a sibling under #names which will hold personnel nodes
+    .each(function(d){ 
+        svg.append("g")
+        .attr("class", "names")
+        .attr("countyid", d.properties.CNTY00) 
+        } )
+    .attr("class", "countygeom")
+    .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
+    .append("path")
+    .attr("d", path)
+    .attr("fill", "hsl(81,50%,45%)")
+    .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
+    .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
 
-	d3.selectAll("g.countygeom")
-		.on('click',function(d) {
-          t = d3.select(this)
-          cty = t.attr("countyid")
-          zoomfactor = 2
-          // select this element and its name container sibling
-		  t.push( d3.selectAll(".names[countyid=\""+cty+"\"]")[0] )
-		  c = path.centroid(d)
-		  zoomed = (t.attr("zoom") == 1)
- 		  c.x = (zoomed? (1-zoomfactor)*c[0] : 0)
-		  c.y = (zoomed? (1-zoomfactor)*c[1] : 0)
-          t.each( function() { this.parentNode.appendChild(this) } )
-		  t.attr("zoom", (zoomed? zoomfactor : 1))
-		  .transition()
-		  .duration(500)
-		  .attr("transform",
-			"translate(" + c.x + "," + c.y +")scale(" + t.attr("zoom") +")"
-			)
-        // z-index cleanup - after a zoom finishes, all circles should be on top
-        // might also be helpful to use Node.insertBefore() ?
-        // TODO: this can be interrupted, but there should only ever be one zoomed county anyway!
-          .each("end", function() { if (zoomed == false) {
-            d3.selectAll(".names").each( function() { this.parentNode.appendChild(this) } )
-          } } )
- 		} )
 console.log("done processing counties")
   if(!--remaining) doCasualties();
 });
@@ -90,7 +58,6 @@ function zoom(obj,scale,trans) {
 }
 
 function sortDataByCounty( data ) {
-    //ret = {};
     ret = [];
     data.map( function(d) { 
         
@@ -182,7 +149,6 @@ function doCasualties() {
                 "top": pos[1]+30+"px"
             }) 
             infobox.transition().duration(100)
-           // .ease("elastic", 100, 10)
             .style({"left": pos[0]+"px", "top": pos[1]+"px"}) 
         })
 }
