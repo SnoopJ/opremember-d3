@@ -13,7 +13,45 @@ from base64 import b64decode
 from collections import OrderedDict
 import re
 
+# TODO: ask dad if rec.county="BALTIMORE" is county, city, or possibly both...
+# dict of regex inputs
+counties = {
+1:"Allegany",
+3:"Anne Arundel",
+5:"Baltimore County",
+9:"Calvert",
+11:"Caroline",
+13:"Carroll",
+15:"Cecil",
+17:"Charles",
+19:"Dorchester",
+21:"Frederick",
+23:"Garrett",
+25:"Harford",
+27:"Howard",
+29:"Kent",
+31:"Montgomery",
+#33:"Prince George's",
+33:"Prince",
+35:"Queen Anne",
+37:"Mary",
+39:"Somerset",
+41:"Talbot",
+43:"Washington",
+45:"Wicomico",
+47:"Worcester",
+510:"Baltimore( CITY)?$",
+# cheating here just so I can see what else breaks.
+999:"OTHER"
+}
+
+# dict of compiled regexes
+ctyregs = {}
+for ctyid,cty in counties.iteritems():
+    ctyregs[ctyid] = re.compile(cty,re.IGNORECASE)
+
 DOPHOTOS = False
+#DOPHOTOS = True
 if not DOPHOTOS:
     print("Skipping photo processing...")
 
@@ -26,6 +64,9 @@ imgdir = 'img'
 
 placesfile = file('placenames.txt','r')
 places = placesfile.readlines()
+
+countiesfile = file('counties.txt','r')
+#counties = countiesfile.read()
 
 # Thanks, stackoverflow!
 def warning(*objs):
@@ -75,15 +116,14 @@ def getTag(rec,tag):
 def initRec(rec):
     rec.recid = int(rec.find("REC").text)
 
-def getLocation(name):
-    r = re.compile("^[^\t]+\t"+re.escape(name.lstrip()),re.IGNORECASE)
+def getLocation(rec):
+    r = re.compile("^[^\t]+\t"+re.escape(rec.hometown.lstrip()),re.IGNORECASE)
     res = []
     for p in places:
 	    if r.search(p) is not None:
 		    res.append(p)
     return res
 
-# XML is gross.
 for rec in indb:
     initRec(rec)
 
@@ -95,12 +135,29 @@ for rec in indb:
     rec.lname = getTag(rec,"LNAME")
     photo = getPhoto(rec)
     rec.county = getTag(rec,"COUNTY")
+
+    recconfirmed = False
+    for ctyid,r in ctyregs.iteritems():
+        print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
+        if r.search(rec.county) is not None:
+            if recconfirmed:
+                print("Tried to confirm twice!")
+                raise SystemExit
+            rec.countyid = ctyid
+            print("Confirmed countyid %s"%ctyid)
+            recconfirmed = True
+    if not recconfirmed:
+        print("Could not confirm!")
+        raise SystemExit
     
     rec.hometown = getTag(rec,"HOME")
     rec.latitude = -77
     rec.longitude = 39
+    # TODO: resolve county name with county id, then check against county
+    #   that SHOULD resolve duplicate false positives...
+    # 10th field in placenames.txt is 3-digit county id
     if rec.hometown is not None:
-        loc = getLocation(rec.hometown)
+        loc = getLocation(rec)
         if len(loc) > 0:
             print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
             info = (loc[0]).split("\t")
@@ -111,6 +168,12 @@ for rec in indb:
             rec.longitude = lng
         else:
             print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
+        print("Testing %i results against county name %s" % (len(loc),rec.county))
+        for l in loc:
+            info = l.split("\t")
+            #print("raw candidate %s" % info)
+            if int(info[11]) == rec.countyid:
+                print("Hometown candidate %s is in county %s" % (info[1],info[11]))
 	
     outfile = file('json/'+str(rec.recid)+".json",'w')
     outrec = OrderedDict( [

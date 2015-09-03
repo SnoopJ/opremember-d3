@@ -27,3 +27,7 @@ path:hover {
   fill: blue;
   stroke: black;
 }
+
+.countygeom {
+  fill: hsl(81,50%,45%);
+}
