@@ -1,9 +1,10 @@
 var remaining = 2; // Global var to trigger post-load processing
+var casualtyjson = {}; // Global var to contain JSON...async grossness
 
 var width = 960,
     height = 900;
 
-var defaulttext = "Mouse over a county or personnel node to see its name.  Click a county to enlarge it."
+var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node."
 d3.select("#curr").text(defaulttext)
 
 var projection = d3.geo.mercator()
@@ -46,7 +47,10 @@ d3.json("md.json", function(error, md) {
       .attr("class", "names")
       .attr("countyid", d.properties.CNTY00) 
     })
-  if(!--remaining) doCasualties();
+  if(!--remaining) {
+    console.log(remaining);
+    doCasualties(casualtyjson);
+  }
 });
 
 function createInfobox(d) { 
@@ -104,9 +108,10 @@ function getCasualties() {
 }
 
 d3.json("ormvdb.json", function(e,json) {
+    casualtyjson = json;
     if(!--remaining) {
         console.log(remaining);
-        doCasualties(json);
+        doCasualties(casualtyjson);
     }
 })
 
