@@ -213,6 +213,7 @@
 4347238	Angelica	Angelica		38.5854	-76.52468	P	PPL	US		MD	009			0	31	40	America/New_York	2006-01-15
 4347241	Annandale	Annandale		39.32344	-76.9747	P	PPL	US		MD	027			0	192	194	America/New_York	2006-01-15
 4347244	Andrews Manor	Andrews Manor		38.814	-76.89803	P	PPL	US		MD	033			0	82	83	America/New_York	2006-01-15
+4347242	Annapolis	Annapolis	ANP,Anapoles,Anapoli,Anapolis,Anapolisa,Anapolės,Anapołi,Annapolis,Annapòlis,Gorad Anapalis,an na bo li si,anabwlys  maryland,anapealis,anapolis,anapolliseu,anaporisu,anapwlys,aynapwls,enapolisa,Αννάπολις,Анаполис,Аннаполис,Аннаполіс,Горад Анапаліс,Աննապոլիս,אנאפוליס,آناپولیس,أنابوليس، ماريلاند,ایناپولس,ایناپولس، میری لینڈ,अ‍ॅनापोलिस,एनापोलिस,அனாபொலிஸ்,അനാപൊളിസ്,แอนแนโพลิส,አናፖሊስ,アナポリス,安那波利斯,아나폴리스	38.97845	-76.49218	P	PPLA	US		MD	003			38394	12	17	America/New_York	2011-05-14
 4347248	Annapolis Cove	Annapolis Cove		38.93956	-76.46051	P	PPL	US		MD	003			0	4	17	America/New_York	2006-01-15
 4347257	Annapolis Landing	Annapolis Landing		38.94011	-76.58302	P	PPL	US		MD	003			0	17	16	America/New_York	2006-01-15
 4347270	Annapolis Roads	Annapolis Roads		38.95122	-76.47496	P	PPL	US		MD	003			0	12	19	America/New_York	2010-02-15
