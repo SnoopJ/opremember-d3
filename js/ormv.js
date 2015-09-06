@@ -1,11 +1,23 @@
 var remaining = 2; // Global var to trigger post-load processing
 var casualtyjson = {}; // Global var to contain JSON...async grossness
+var fakeImages = true; // Global var, fake images or real ones?
 
 var width = 960,
     height = 900;
 
 var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node."
 d3.select("#curr").text(defaulttext)
+
+// Thanks to StackOverflow user Peter Bailey for this nice little diddy
+// http://stackoverflow.com/a/1267338
+function zeroFill( number, width )
+{
+  width -= number.toString().length;
+  if ( width > 0 ) {
+    return new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number;
+  }
+  return number + ""; // always return a string
+}
 
 var projection = d3.geo.mercator()
   .center([-77,37+50/60])
@@ -47,13 +59,14 @@ d3.json("md.json", function(error, md) {
       .attr("class", "names")
       .attr("countyid", d.properties.CNTY00) 
     })
+  console.log("Geometry loaded, "+(remaining-1)+" remaining things to do...");
   if(!--remaining) {
-    console.log(remaining);
+    console.log("call doCasualties()");
     doCasualties(casualtyjson);
   }
 });
 
-function createInfobox(d) { 
+function createInfobox(d,c) { 
     d3.select("#mapcontainer")
       .append("div")
       .attr("class", "infobox")
@@ -71,10 +84,21 @@ function sortDataByCounty( data ) {
   dataByCounty = {};
   data.map(function (d) { 
     if (!Array.isArray(dataByCounty[d.countyid])) { 
-      g = d3.select("g.countygeom[countyid=\""+d.countyid+"\"]")
+      if ( typeof(d.countyid) == 'undefined' ) { 
+        console.log( "Rec " + d.recid + " has no defined countyid, skipping!" )
+        return 
+      }
+      sel = "g.countygeom[countyid=\""+zeroFill(d.countyid,3)+"\"]"
+      console.log(sel)
+      g = d3.select(sel)
+      if ( g.empty() ) {
+        console.log( "Rec " + d.recid + " g.countygeom selector came back empty, skipping!" )
+        return
+      }
       c = path.centroid( g.datum() )
+      //c = [d.latitude, d.longitude];
       // casualty info box
-      createInfobox(d)
+      createInfobox(d,c)
       dataByCounty[d.countyid]=[]
     }
     dataByCounty[d.countyid].push(d)
@@ -91,6 +115,7 @@ function sortDataByCounty( data ) {
   .text(function(d) { return "Casualty: " + d.fname + " " + d.lname } )
   .append("img").attr("src",function(d) { 
     if (!d.hasphoto) { return "" }
+    if ( fakeImages ) { return "img/1111.png" }
     return "img/"+d.recid+".png" 
   })
   return dataByCounty
@@ -100,17 +125,21 @@ function sortDataByCounty( data ) {
 // 'this' corresponds to the <circle> in question, so the parentNode is a .names <g>
 function getCasualties() { 
     countyid = d3.select(this.parentNode).attr("countyid")
-    d=casualtiesbycounty[countyid]
+    console.log("Getting casualties for "+countyid)
+    d=casualtiesbycounty[parseInt(countyid)]
     if (d === undefined) {
         return []
     }
+    console.log(d)
     return [].concat(d)
 }
 
 d3.json("ormvdb.json", function(e,json) {
     casualtyjson = json;
+    console.log("Casualties loaded, "+(remaining-1)+" remaining things to do...");
+    if (e) console.log(e)
     if(!--remaining) {
-        console.log(remaining);
+        console.log("call doCasualties()");
         doCasualties(casualtyjson);
     }
 })
@@ -146,6 +175,7 @@ function createCircle(d) {
     .on("mouseover",hoverCircle)
     .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
     .on("click", clickCircle)
+  if (d.badloc) { elem.style({fill:'black', hover:'blue'}) }
   return elem.node()
 }
 function doCasualties(casualtyjson) {

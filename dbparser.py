@@ -58,11 +58,13 @@ if not DOPHOTOS:
 tree = ET.parse('./ormvmasterfile.xml')
 indb = tree.getroot()
 
-outdb = OrderedDict()
+#outdb = OrderedDict()
+outdb = []
 
 imgdir = 'img'
 
-placesfile = file('placenames.txt','r')
+#placesfile = file('placenames.txt','r')
+placesfile = file('placenamesMDonly.txt','r')
 places = placesfile.readlines()
 
 countiesfile = file('counties.txt','r')
@@ -115,6 +117,7 @@ def getTag(rec,tag):
 
 def initRec(rec):
     rec.recid = int(rec.find("REC").text)
+    rec.badloc = False
 
 def getLocation(rec):
     r = re.compile("^[^\t]+\t"+re.escape(rec.hometown.lstrip()),re.IGNORECASE)
@@ -138,7 +141,7 @@ for rec in indb:
 
     recconfirmed = False
     for ctyid,r in ctyregs.iteritems():
-        print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
+        #print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
         if r.search(rec.county) is not None:
             if recconfirmed:
                 print("Tried to confirm twice!")
@@ -157,38 +160,57 @@ for rec in indb:
     #   that SHOULD resolve duplicate false positives...
     # 10th field in placenames.txt is 3-digit county id
     if rec.hometown is not None:
+        #print("Trying to resolve hometown: %s" % rec.hometown )
         loc = getLocation(rec)
         if len(loc) > 0:
-            print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
+            #print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
             info = (loc[0]).split("\t")
             lat = float(info[4])
-            lng = float(info[5])
-            print("(Lat,Long) should be (%f,%f)" % (lat,lng))
+            lon = float(info[5])
+            #print("(Lat,Long) should be (%f,%f)" % (lat,lon))
             rec.latitude = lat
-            rec.longitude = lng
+            rec.longitude = lon
         else:
             print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
-        print("Testing %i results against county name %s" % (len(loc),rec.county))
+
+        #print("Testing %i results against county name %s" % (len(loc),rec.county))
         for l in loc:
             info = l.split("\t")
             #print("raw candidate %s" % info)
+            if info[11] is '':
+                print("Hometown candidate %s doesn't have a countyid, skipping..." % info[1] )
+                continue
             if int(info[11]) == rec.countyid:
+                llat = float((l.split("\t"))[4])
+                llon = float((l.split("\t"))[5])
+                dist = pow(pow(llat-lat,2)+pow(llon-lon,2),0.5)
+                if dist > 1 :
+                    #print("Dist is larger than 1 for rec %i! \a\a"%rec.recid)
+                    rec.badloc = True
+                print("Distance from loc[0] lat/long is %f"%dist)
                 print("Hometown candidate %s is in county %s" % (info[1],info[11]))
 	
     outfile = file('json/'+str(rec.recid)+".json",'w')
-    outrec = OrderedDict( [
+    outrec = OrderedDict([
         ('recid',rec.recid)
         ,('fname',rec.fname)
         ,('lname',rec.lname) 
         ,('hasphoto',rec.hasphoto)
         ,('photo',photo)
         ,('hometown',rec.hometown)
-	,('latitude',rec.latitude)
-	,('longitude',rec.longitude)
-        ,('county',rec.county) ] )
-    outdb[rec.recid] = outrec
+        ,('latitude',rec.latitude)
+        ,('longitude',rec.longitude)
+        ,('county',rec.county)
+        ,('countyid',rec.countyid) 
+        ,('badloc',rec.badloc)
+    ])
+    outdb.append(outrec)
     print(json.dumps(outrec), file=outfile)
     outfile.close()
     
-#print(json.dumps(outdb),file=outfile)
-#print("]",file=outfile)
+# TODO: shit don't work yo
+outfile = file("ormvdb.json.long",'w')
+print(json.dumps(outdb).replace("},","},\n"),file=outfile) 
+outfile.close()
+
+print("All done!\a\a\a")
