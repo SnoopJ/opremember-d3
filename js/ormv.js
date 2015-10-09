@@ -1,15 +1,16 @@
 var remaining = 2; // Global var to trigger post-load processing
 var casualtyjson = {}; // Global var to contain JSON...async grossness
-var fakeImages = true; // Global var, fake images or real ones?
+var fakeImages = false; // Global var, fake images or real ones?
 
-var width = 960,
-    height = 900;
+var width = 400,
+    height = 225;
 
 var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node."
 d3.select("#curr").text(defaulttext)
 
 // Thanks to StackOverflow user Peter Bailey for this nice little diddy
 // http://stackoverflow.com/a/1267338
+// Fills a number (e.g. 33) to a fixed width string by padding with leading zeroes ("033")
 function zeroFill( number, width )
 {
   width -= number.toString().length;
@@ -21,27 +22,16 @@ function zeroFill( number, width )
 
 var projection = d3.geo.mercator()
   .center([-77,37+50/60])
-  .scale(10000)
-  .translate([width/2,height*0.6])
+    // TODO: scale with svg...somehow.
+  .scale(4000)
+  .translate([width/2,height])
 
 var path = d3.geo.path()
     .projection(projection);
 
-var div = d3.select("body")
-  .append("div")
-  .attr("id", "mapcontainer")
+var svg = d3.select("#mdmap")
   .attr("width", width)
   .attr("height", height)
-  .attr("position", "absolute")
-
-var svg = div.append("svg")
-  .attr("width", width)
-  .attr("height", height)
-
-// Object for containing casualty information
-function casualty(j) {
-  this.json = j
-}
 
 d3.json("md.json", function(error, md) {
   svg.selectAll("path")
@@ -83,23 +73,33 @@ function createInfobox(d,c) {
 function sortDataByCounty( data ) {
   dataByCounty = {};
   data.map(function (d) { 
+    console.log("Recid " + d.recid + " with lat/lon (" + d.latitude + "," + d.longitude + ")" )
+    if (d.countyid === 999) { 
+      console.log( "Rec " + d.recid + " is marked county 999, skipping")
+      return
+    }
+    sel = "g.countygeom[countyid=\""+zeroFill(d.countyid,3)+"\"]"
+    g = d3.select(sel)
+    if ( g.empty() ) {
+      console.log( "Rec " + d.recid + " g.countygeom selector ("+sel+") came back empty, skipping!" )
+      return
+    }
     if (!Array.isArray(dataByCounty[d.countyid])) { 
       if ( typeof(d.countyid) == 'undefined' ) { 
         console.log( "Rec " + d.recid + " has no defined countyid, skipping!" )
         return 
       }
-      sel = "g.countygeom[countyid=\""+zeroFill(d.countyid,3)+"\"]"
-      console.log(sel)
-      g = d3.select(sel)
-      if ( g.empty() ) {
-        console.log( "Rec " + d.recid + " g.countygeom selector came back empty, skipping!" )
-        return
-      }
       c = path.centroid( g.datum() )
-      //c = [d.latitude, d.longitude];
-      // casualty info box
       createInfobox(d,c)
       dataByCounty[d.countyid]=[]
+    }
+// TODO: resolve null lat/lon pairs to centroid of parent (and color or something)
+    if ( d.latitude === null ) {
+        console.log("Null lat for record " + d.recid + ", using parent centroid")
+        c = projection.invert(path.centroid( g.datum() ))
+        console.log("Parent centroid is " + c)
+        d.latitude = c[1]
+        d.longitude = c[0]
     }
     dataByCounty[d.countyid].push(d)
   })
@@ -114,9 +114,10 @@ function sortDataByCounty( data ) {
   .append("p")
   .text(function(d) { return "Casualty: " + d.fname + " " + d.lname } )
   .append("img").attr("src",function(d) { 
-    if (!d.hasphoto) { return "" }
+    if (!d.hasphoto || d.photo === null ) { return "" }
     if ( fakeImages ) { return "img/1111.png" }
-    return "img/"+d.recid+".png" 
+    //return "img/"+d.recid+".png" 
+    return "img/"+d.photo 
   })
   return dataByCounty
 }
@@ -125,12 +126,11 @@ function sortDataByCounty( data ) {
 // 'this' corresponds to the <circle> in question, so the parentNode is a .names <g>
 function getCasualties() { 
     countyid = d3.select(this.parentNode).attr("countyid")
-    console.log("Getting casualties for "+countyid)
+//    console.log("Getting casualties for "+countyid)
     d=casualtiesbycounty[parseInt(countyid)]
     if (d === undefined) {
         return []
     }
-    console.log(d)
     return [].concat(d)
 }
 
@@ -167,6 +167,7 @@ function createCircle(d) {
   // Using createElementNS is necessary, <circle> is not meaningful in the HTML namespace
   elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg","circle"))
     .attr("class", "name")
+    .attr("recid", d.recid)
     .attr("r",5)
     .attr("transform", function() { 
       proj = projection([d.longitude,d.latitude])
@@ -175,7 +176,10 @@ function createCircle(d) {
     .on("mouseover",hoverCircle)
     .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
     .on("click", clickCircle)
-  if (d.badloc) { elem.style({fill:'black', hover:'blue'}) }
+  if (d.badloc) { 
+    elem.style({fill:'black', hover:'blue'}) 
+  }
+  console.log("Creating circle for record "+d.recid+" with lat/lon ("+d.latitude+","+d.longitude+")")
   return elem.node()
 }
 function doCasualties(casualtyjson) {
