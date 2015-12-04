@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html>
 <meta charset="utf-8">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<!-- local working copy of bootstrap
+<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">-->
 <link rel="stylesheet" href="bootstrap.css">
--->
 <link rel="stylesheet" href="style.css">
 <body>
 <span id="curr"></span>
@@ -12,16 +10,52 @@
 
 <div class="row showme">
     <div class="row showme">
-        <div class="col-sm-4 showme">
+        <div class="col-sm-4 showme text-center">
             <span>control panel</span>
+            <div id="casualtyinfo"> <!-- overflow y scroll? -->
+                <!-- row template
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Field Name:</b></div>
+                    <div id="cas-name" class="showme col-sm-6 text-left">Field Value</div>
+                </div> -->
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Casualty name:</b></div>
+                    <div id="cas-name" class="showme col-sm-6 text-left">John Doe</div>
+                </div>
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Casualty hometown:</b></div>
+                    <div id="cas-hometown" class="showme col-sm-6 text-left">Anytown, MD</div>
+                </div>
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Casualty picture:</b></div>
+                    <div id="cas-pic" class="showme col-sm-6 text-left"><img src="img/1111.png" style="width:95%"/></div>
+                </div>
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Service:</b></div>
+                    <div id="cas-svc" class="showme col-sm-6 text-left">Army</div>
+                </div>
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Date of birth:</b></div>
+                    <div id="cas-dob" class="showme col-sm-6 text-left">01/01/1970</div>
+                </div>
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Casualty date:</b></div>
+                    <div id="cas-dod" class="showme col-sm-6 text-left">01/01/1970</div>
+                </div>
+                <div class="row">
+                    <div class="showme col-sm-6 text-right"><b>Wall location:</b></div>
+                    <div id="cas-wall" class="showme col-sm-6 text-left">Panel 42E, Line 001</div>
+                </div>
+            </div>
             <!-- todo: control panels -->
         </div>
-        <div class="col-sm-4 showme" style="width:auto">
-            <div class="row showme">
+        <div class="col-sm-8 showme text-center">
+            <div class="row showme text-center">
+                <span>map of maryland</span><BR>
                 <svg id="mdmap"></svg>
             </div>
-            <div class="row showme">
-                <span>map of vietnam</span>
+            <div class="row showme text-center">
+                <span>map of vietnam</span><BR>
                 <svg id="vietmap"></svg>
             </div>
         </div>

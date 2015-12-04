@@ -2,8 +2,8 @@ var remaining = 2; // Global var to trigger post-load processing
 var casualtyjson = {}; // Global var to contain JSON...async grossness
 var fakeImages = false; // Global var, fake images or real ones?
 
-var width = 400,
-    height = 225;
+var width = 712,
+    height = 400;
 
 var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node."
 d3.select("#curr").text(defaulttext)
@@ -23,8 +23,8 @@ function zeroFill( number, width )
 var projection = d3.geo.mercator()
   .center([-77,37+50/60])
     // TODO: scale with svg...somehow.
-  .scale(4000)
-  .translate([width/2,height])
+  .scale(7000)
+  .translate([width/2,height*0.9])
 
 var path = d3.geo.path()
     .projection(projection);
