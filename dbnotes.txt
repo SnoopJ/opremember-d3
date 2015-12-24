@@ -1,0 +1,28 @@
+DB notes (minus obvious stuff):
+
+IDNO - military service ID?
+PHOTO - appears to be boolean (0/1)
+PID - ???
+SVC - service identifier
+    A - army
+    M - marines
+    N - navy
+    F - air force?
+    ? - unknown (only 3 of these)
+COMP - company?
+MOS - I know this is service related, can't remember what it is
+CAS1-CAS3 - ???
+BODY - either "???" or "BNR," something to do with remains?
+CTRY - country, VN/VS for north/south Vietnam; LA = Laos, CB = Cambodia?
+PROV - province code I think, how is this coded?
+LSVC - length of service? months?
+RACE - C/N/Z.  C = Caucasian, N=???, Z=???
+REL - ???
+MAR - ???
+CIT - no idea, set to 1 for everyone...
+TOURD - tour date (begin?) in YYMMDD format
+REFNO - ???
+PDATE - seems to be related to CASDATE
+NPA - boolean, ???
+photo_x0020_attachments - photo(s)
+provlist - duplicate vitals?
