@@ -29,8 +29,10 @@ var path = d3.geo.path()
     .projection(projection);
 
 var svg = d3.select("#mdmap")
-  .attr("width", width)
-  .attr("height", height)
+  // .attr("width", width)
+  // .attr("height", height)
+  .attr("preserveAspectRatio", "xMinYMin meet")
+  .attr("viewBox", "0 0 600 400")
 
 d3.json("md.json", function(error, mapdata) {
   svg.selectAll("path")
@@ -102,7 +104,7 @@ function createCircle(d) {
     .attr("transform", function() {
       var lat,lon;
       // "latitude": 38.40481, "longitude": -75.56508
-      if (d.latitude == null || d.longitude == null) {
+      if ( d.badloc || d.latitude == null || d.longitude == null) {
         d3.select(this).style({fill:'yellow'});
       }
       lat = d.latitude || 39.2904;
