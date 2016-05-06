@@ -89,6 +89,15 @@ function clickCircle(d) {
   infobox = d3.select("#infobox"+d.countyid)
   infobox.style("visibility", "visible")
 
+  d3.selectAll("#casualtyinfo>.row>div.text-left")
+    .text("")
+  d3.select("#cas-name").text(d.fname + " " + d.lname)
+  if (d.hasphoto && d.photo) {
+    d3.select("#cas-pic").select("img").attr("src","img/"+d.photo)
+  } else {
+    d3.select("#cas-pic").select("img").attr("src","img/1111.png")
+  }
+  d3.select("#COUNTY").text(d.county)
   // animate a slide-in
   pos = d3.transform( d3.select(this).attr("transform") ).translate
   infobox.style({ "left": pos[0]+20+"px", "top": pos[1]+30+"px" })
@@ -106,7 +115,6 @@ function createCircle(d) {
       var lat,lon;
       // "latitude": 38.40481, "longitude": -75.56508
       if ( d.badloc && d.longitude == -78.6122 ) {
-        console.log([d.longitude,d.latitude]);
         d.longitude = -78.69971 + Math.random(); // randomly spread out the badlocs that are other states/etc.
         d.latitude = 39 - Math.random();
       }
@@ -143,6 +151,7 @@ function doCasualties(casualtyjson) {
       var cty = zeroFill(d.countyid,3);
       return cty;
     })
+  d3.selectAll(".name").filter( function(d) { return d.hasphoto && d.photo }).style("fill","#00ea2e");
   d3.selectAll(".badloc").style("fill","red") // color bad locations red, for now
 }
 

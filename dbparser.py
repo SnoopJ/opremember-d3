@@ -51,8 +51,8 @@ ctyregs = {}
 for ctyid,cty in counties.iteritems():
     ctyregs[ctyid] = re.compile(cty,re.IGNORECASE)
 
-DOPHOTOS = False
-#DOPHOTOS = True
+# DOPHOTOS = False
+DOPHOTOS = True
 if not DOPHOTOS:
     print("Skipping photo processing...")
 
@@ -75,6 +75,7 @@ def getPhoto(rec):
     rec.hasphoto = bool(rec.find("PHOTO").text)
     if not rec.hasphoto :
         print("INFO: no photo for record " + str(rec.recid))
+        rec.photo = "1111.png"
         return None
 
     photo = rec.find("photo_x0020_attachments")
@@ -102,6 +103,8 @@ def getPhoto(rec):
             except :
                 warning("Could not decode photo for record " + str(rec.recid))
                 return None
+    else:
+        return "1111.png"
 
 
 def getTag(rec,tag):
@@ -164,7 +167,7 @@ def doRecs(db,idx=-1):
 
         rec.fname = getTag(rec,"FNAME")
         rec.lname = getTag(rec,"LNAME")
-        photo = getPhoto(rec)
+        rec.photo = getPhoto(rec)
         rec.county = getTag(rec,"COUNTY")
 
         recconfirmed = False
@@ -229,7 +232,7 @@ def doRecs(db,idx=-1):
                 ,('fname',rec.fname)
                 ,('lname',rec.lname)
                 ,('hasphoto',rec.hasphoto)
-                ,('photo',photo)
+                ,('photo',rec.photo)
                 ,('hometown',rec.hometown)
                 ,('latitude',rec.latitude)
                 ,('longitude',rec.longitude)
