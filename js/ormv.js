@@ -39,7 +39,7 @@ d3.json("md.json", function(error, mapdata) {
     .data(topojson.feature(mapdata, mapdata.objects.out).features)
     .enter()
     .append("g")
-    .attr("class", "countygeom")
+    .classed("countygeom",true)
     .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
     .append("path")
     .attr("d", path)
@@ -55,7 +55,7 @@ d3.json("md.json", function(error, mapdata) {
 function createInfobox(d,c) {
     d3.select("#mapcontainer")
       .append("div")
-      .attr("class", "infobox")
+      .classed("infobox",true)
       .attr("id", "infobox"+d.countyid)
       .attr("countyid", d.countyid)
       .style({
@@ -98,31 +98,32 @@ function clickCircle(d) {
 function createCircle(d) {
   // Using createElementNS is necessary, <circle> is not meaningful in the HTML namespace
   elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg","circle"))
-    .attr("class", "name")
+    .classed("name",true)
+    .classed("badloc",function() { return d.badloc })
     .attr("recid", d.recid)
     .attr("r",3)
     .attr("transform", function() {
       var lat,lon;
       // "latitude": 38.40481, "longitude": -75.56508
-      if ( d.badloc || d.latitude == null || d.longitude == null) {
-        d3.select(this).style({fill:'yellow'});
+      if ( d.badloc && d.longitude == -78.6122 ) {
+        console.log([d.longitude,d.latitude]);
+        d.longitude = -78.69971 + Math.random(); // randomly spread out the badlocs that are other states/etc.
+        d.latitude = 39 - Math.random();
       }
-      lat = d.latitude || 39.2904;
-      lon = d.longitude || -78.6122;
+      lat = d.latitude;
+      lon = d.longitude;
+
       proj = projection([lon,lat])
       return "translate("+ proj[0] +"," + proj[1] + ")"
     })
     .on("mouseover",hoverCircle)
     .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
     .on("click", clickCircle)
-  if (d.badloc) {
-    elem.style({fill:'black', hover:'blue'})
-  }
   // console.log("Creating circle for record "+d.recid+" with lat/lon ("+d.latitude+","+d.longitude+")")
   return elem.node()
 }
 function doCasualties(casualtyjson) {
-  svg.append("g").attr("class","countynames")
+  svg.append("g").classed("countynames",true)
     .selectAll("g")
     .data(casualtyjson)
     .enter()
@@ -142,6 +143,7 @@ function doCasualties(casualtyjson) {
       var cty = zeroFill(d.countyid,3);
       return cty;
     })
+  d3.selectAll(".badloc").style("fill","red") // color bad locations red, for now
 }
 
 d3.select(self.frameElement).style("height", height + "px");

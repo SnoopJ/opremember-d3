@@ -150,13 +150,13 @@ hometownswaps = {
 'MOUNT RANIER': 'MOUNT RAINIER',
 'WHALEYSVILLE': 'WHALEYVILLE'
 }
-def doRecs(db,idx=0):
+def doRecs(db,idx=-1):
     # for rec in indb:
     while idx < len(db)-1:
-        print("Processing %i"%idx)
         idx += 1
         rec = db[idx]
         initRec(rec)
+        print("Processing recid %i (idx %i)"%(rec.recid,idx))
 
         if rec.recid in outdb:
             warning("Duplicate record ID ({0}), skipping".format(rec.recid))
@@ -181,12 +181,15 @@ def doRecs(db,idx=0):
             print("Could not confirm!")
             raise SystemExit
 
-        rec.hometown = getTag(rec,"HOME") or "?"
+        rec.hometown = getTag(rec,"HOME")
+        if rec.hometown is None:
+            rec.hometown = '?'
+            rec.badloc = True
         if rec.hometown.strip() in hometownswaps.keys():
             print("Correcting hometown from %s to %s",rec.hometown,hometownswaps[rec.hometown.strip()])
             rec.hometown = hometownswaps[rec.hometown.strip()]
-        rec.latitude = -78.6122
-        rec.longitude = 39.2904
+        rec.longitude = -78.6122
+        rec.latitude = 39.2904
         # TODO: resolve county name with county id, then check against county
         #   that SHOULD resolve duplicate false positives...
         # 10th field in placenames.txt is 3-digit county id
@@ -197,7 +200,9 @@ def doRecs(db,idx=0):
                 parseLocation(loc,rec)
             else:
                 print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
-                code.interact(local=dict(globals(), **locals()))
+                rec.badloc = True
+                # uncomment to interactively poke around with what went wrong
+                # code.interact(local=dict(globals(), **locals()))
 
             #print("Testing %i results against county name %s" % (len(loc),rec.county))
             for l in loc:
@@ -212,29 +217,29 @@ def doRecs(db,idx=0):
                     llat = float((l.split("\t"))[4])
                     llon = float((l.split("\t"))[5])
                     dist = pow(pow(llat-lat,2)+pow(llon-lon,2),0.5)
-                    if dist > 1 :
+                    if dist > 1 : # mark the location as suspect if candidates are "too far" apart
                         #print("Dist is larger than 1 for rec %i! \a\a"%rec.recid)
                         rec.badloc = True
                     print("Distance from loc[0] lat/long is %f"%dist)
                     print("Hometown candidate %s is in county %s" % (info[1],info[11]))
 
-        outfile = file('json/'+str(rec.recid)+".json",'w')
-        outrec = OrderedDict([
-            ('recid',rec.recid)
-            ,('fname',rec.fname)
-            ,('lname',rec.lname)
-            ,('hasphoto',rec.hasphoto)
-            ,('photo',photo)
-            ,('hometown',rec.hometown)
-            ,('latitude',rec.latitude)
-            ,('longitude',rec.longitude)
-            ,('county',rec.county)
-            ,('countyid',rec.countyid)
-            ,('badloc',rec.badloc)
-        ])
-        outdb.append(outrec)
-        print(json.dumps(outrec), file=outfile)
-        outfile.close()
+        with file('json/'+str(rec.recid)+".json",'w') as outfile:
+            outrec = OrderedDict([
+                ('recid',rec.recid)
+                ,('fname',rec.fname)
+                ,('lname',rec.lname)
+                ,('hasphoto',rec.hasphoto)
+                ,('photo',photo)
+                ,('hometown',rec.hometown)
+                ,('latitude',rec.latitude)
+                ,('longitude',rec.longitude)
+                ,('county',rec.county)
+                ,('countyid',rec.countyid)
+                ,('badloc',rec.badloc)
+            ])
+            outdb.append(outrec)
+            json.dump(outrec,outfile)
+            # print(json.dumps(outrec), file=outfile)
 
 doRecs(indb)
 # TODO: shit don't work yo

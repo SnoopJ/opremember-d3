@@ -1,1 +1,1 @@
-{"recid": 303, "fname": "CALVIN KYRLE JR", "lname": "GRAESER", "hasphoto": true, "photo": null, "hometown": "WAYNE PA", "latitude": -78.6122, "longitude": 39.2904, "county": "OTHER", "countyid": 999, "badloc": false}
+{"recid": 303, "fname": "CALVIN KYRLE JR", "lname": "GRAESER", "hasphoto": true, "photo": null, "hometown": "WAYNE PA", "latitude": 39.2904, "longitude": -78.6122, "county": "OTHER", "countyid": 999, "badloc": true}
