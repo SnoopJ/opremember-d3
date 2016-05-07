@@ -35,7 +35,8 @@ var svg = d3.select("#mdmap")
   .attr("viewBox", "0 0 600 400")
 
 d3.json("md.json", function(error, mapdata) {
-  svg.selectAll("path")
+  svg.append("g").attr("id","MDgeo")
+    .selectAll("path")
     .data(topojson.feature(mapdata, mapdata.objects.out).features)
     .enter()
     .append("g")
@@ -47,9 +48,19 @@ d3.json("md.json", function(error, mapdata) {
     .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
   // console.log("Geometry loaded, "+(remaining-1)+" remaining things to do...");
   if(!--remaining) {
-    // console.log("call doCasualties()");
     doCasualties(casualtyjson);
   }
+});
+
+d3.json("DC.json", function(error, mapdata) {
+  svg.append("g").attr("id","DCgeo")
+    .selectAll("path")
+    .data(topojson.feature(mapdata, mapdata.objects.DCout).features)
+    .enter()
+    .append("g")
+    .classed("DCgeom",true)
+    .append("path")
+    .attr("d", path)
 });
 
 function createInfobox(d,c) {
