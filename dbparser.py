@@ -12,6 +12,7 @@ import json
 from base64 import b64decode
 from collections import OrderedDict
 import re
+import code
 
 # TODO: ask dad if rec.county="BALTIMORE" is county, city, or possibly both...
 # dict of regex inputs
@@ -50,8 +51,8 @@ ctyregs = {}
 for ctyid,cty in counties.iteritems():
     ctyregs[ctyid] = re.compile(cty,re.IGNORECASE)
 
-DOPHOTOS = False
-#DOPHOTOS = True
+# DOPHOTOS = False
+DOPHOTOS = True
 if not DOPHOTOS:
     print("Skipping photo processing...")
 
@@ -63,12 +64,8 @@ outdb = []
 
 imgdir = 'img'
 
-#placesfile = file('placenames.txt','r')
-placesfile = file('placenamesMDonly.txt','r')
+placesfile = file('MDppls.txt','r')
 places = placesfile.readlines()
-
-countiesfile = file('counties.txt','r')
-#counties = countiesfile.read()
 
 # Thanks, stackoverflow!
 def warning(*objs):
@@ -78,6 +75,7 @@ def getPhoto(rec):
     rec.hasphoto = bool(rec.find("PHOTO").text)
     if not rec.hasphoto :
         print("INFO: no photo for record " + str(rec.recid))
+        rec.photo = "1111.png"
         return None
 
     photo = rec.find("photo_x0020_attachments")
@@ -89,7 +87,7 @@ def getPhoto(rec):
         else:
             if not os.path.exists(imgdir):
                 os.makedirs(imgdir)
-            
+
             try :
                 p = b64decode(photo.find("FileData").text.replace("\n","").replace("\r",""))
                 # TODO(?): sanity check here, not all extensions are 3 letters...
@@ -105,6 +103,8 @@ def getPhoto(rec):
             except :
                 warning("Could not decode photo for record " + str(rec.recid))
                 return None
+    else:
+        return "1111.png"
 
 
 def getTag(rec,tag):
@@ -127,90 +127,127 @@ def getLocation(rec):
 		    res.append(p)
     return res
 
-for rec in indb:
-    initRec(rec)
+def parseLocation(loc,rec):
+    if len(loc) > 0:
+        #print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
+        info = (loc[0]).split("\t")
+        lat = float(info[4])
+        lon = float(info[5])
+        #print("(Lat,Long) should be (%f,%f)" % (lat,lon))
+        rec.latitude = lat
+        rec.longitude = lon
+    else:
+        print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
+        code.interact(local=dict(globals(), **locals()))
 
-    if rec.recid in outdb:
-        warning("Duplicate record ID ({0}), skipping".format(rec.recid))
-        continue
+def fixRecLocation(newlocname,rec):
+    rec.hometown = newlocname
+    newloc = getLocation(rec)
+    parseLocation(newloc,rec)
 
-    rec.fname = getTag(rec,"FNAME")
-    rec.lname = getTag(rec,"LNAME")
-    photo = getPhoto(rec)
-    rec.county = getTag(rec,"COUNTY")
+hometownswaps = {
+'MARLOWE HEIGHTS': 'MARLOW HEIGHTS',
+'LONACONNG': 'LONACONING',
+'ROSS NECK': 'CAMBRIDGE',  # there is no place called ROSS NECK, but there's a Rossneck airport in Cambridge...
+'WEST HYATTSVILLE': 'HYATTSVILLE',
+'MOUNT RANIER': 'MOUNT RAINIER',
+'WHALEYSVILLE': 'WHALEYVILLE'
+}
+def doRecs(db,idx=-1):
+    # for rec in indb:
+    while idx < len(db)-1:
+        idx += 1
+        rec = db[idx]
+        initRec(rec)
+        print("Processing recid %i (idx %i)"%(rec.recid,idx))
 
-    recconfirmed = False
-    for ctyid,r in ctyregs.iteritems():
-        #print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
-        if r.search(rec.county) is not None:
-            if recconfirmed:
-                print("Tried to confirm twice!")
-                raise SystemExit
-            rec.countyid = ctyid
-            print("Confirmed countyid %s"%ctyid)
-            recconfirmed = True
-    if not recconfirmed:
-        print("Could not confirm!")
-        raise SystemExit
-    
-    rec.hometown = getTag(rec,"HOME")
-    rec.latitude = -77
-    rec.longitude = 39
-    # TODO: resolve county name with county id, then check against county
-    #   that SHOULD resolve duplicate false positives...
-    # 10th field in placenames.txt is 3-digit county id
-    if rec.hometown is not None:
-        #print("Trying to resolve hometown: %s" % rec.hometown )
-        loc = getLocation(rec)
-        if len(loc) > 0:
-            #print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
-            info = (loc[0]).split("\t")
-            lat = float(info[4])
-            lon = float(info[5])
-            #print("(Lat,Long) should be (%f,%f)" % (lat,lon))
-            rec.latitude = lat
-            rec.longitude = lon
-        else:
-            print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
+        if rec.recid in outdb:
+            warning("Duplicate record ID ({0}), skipping".format(rec.recid))
+            continue
 
-        #print("Testing %i results against county name %s" % (len(loc),rec.county))
-        for l in loc:
-            info = l.split("\t")
-            #print("raw candidate %s" % info)
-            if info[11] is '':
-                print("Hometown candidate %s doesn't have a countyid, skipping..." % info[1] )
-                continue
-            if int(info[11]) == rec.countyid:
-                llat = float((l.split("\t"))[4])
-                llon = float((l.split("\t"))[5])
-                dist = pow(pow(llat-lat,2)+pow(llon-lon,2),0.5)
-                if dist > 1 :
-                    #print("Dist is larger than 1 for rec %i! \a\a"%rec.recid)
-                    rec.badloc = True
-                print("Distance from loc[0] lat/long is %f"%dist)
-                print("Hometown candidate %s is in county %s" % (info[1],info[11]))
-	
-    outfile = file('json/'+str(rec.recid)+".json",'w')
-    outrec = OrderedDict([
-        ('recid',rec.recid)
-        ,('fname',rec.fname)
-        ,('lname',rec.lname) 
-        ,('hasphoto',rec.hasphoto)
-        ,('photo',photo)
-        ,('hometown',rec.hometown)
-        ,('latitude',rec.latitude)
-        ,('longitude',rec.longitude)
-        ,('county',rec.county)
-        ,('countyid',rec.countyid) 
-        ,('badloc',rec.badloc)
-    ])
-    outdb.append(outrec)
-    print(json.dumps(outrec), file=outfile)
-    outfile.close()
-    
+        rec.fname = getTag(rec,"FNAME")
+        rec.lname = getTag(rec,"LNAME")
+        rec.photo = getPhoto(rec)
+        rec.county = getTag(rec,"COUNTY")
+
+        recconfirmed = False
+        for ctyid,r in ctyregs.iteritems():
+            #print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
+            if r.search(rec.county) is not None:
+                if recconfirmed:
+                    print("Tried to confirm twice!")
+                    raise SystemExit
+                rec.countyid = ctyid
+                print("Confirmed countyid %s"%ctyid)
+                recconfirmed = True
+        if not recconfirmed:
+            print("Could not confirm!")
+            raise SystemExit
+
+        rec.hometown = getTag(rec,"HOME")
+        if rec.hometown is None:
+            rec.hometown = '?'
+            rec.badloc = True
+        if rec.hometown.strip() in hometownswaps.keys():
+            print("Correcting hometown from %s to %s",rec.hometown,hometownswaps[rec.hometown.strip()])
+            rec.hometown = hometownswaps[rec.hometown.strip()]
+        rec.longitude = -78.6122
+        rec.latitude = 39.2904
+        # TODO: resolve county name with county id, then check against county
+        #   that SHOULD resolve duplicate false positives...
+        # 10th field in placenames.txt is 3-digit county id
+        if rec.hometown is not None:
+            #print("Trying to resolve hometown: %s" % rec.hometown )
+            loc = getLocation(rec)
+            if len(loc) > 0:
+                parseLocation(loc,rec)
+            else:
+                print("Hometown (%s) not recovered (recid %s)"% (rec.hometown,rec.recid))
+                rec.badloc = True
+                # uncomment to interactively poke around with what went wrong
+                # code.interact(local=dict(globals(), **locals()))
+
+            #print("Testing %i results against county name %s" % (len(loc),rec.county))
+            for l in loc:
+                info = l.split("\t")
+                lat = rec.latitude
+                lon = rec.longitude
+                #print("raw candidate %s" % info)
+                if info[11] is '':
+                    print("Hometown candidate %s doesn't have a countyid, skipping..." % info[1] )
+                    continue
+                if int(info[11]) == rec.countyid:
+                    llat = float((l.split("\t"))[4])
+                    llon = float((l.split("\t"))[5])
+                    dist = pow(pow(llat-lat,2)+pow(llon-lon,2),0.5)
+                    if dist > 1 : # mark the location as suspect if candidates are "too far" apart
+                        #print("Dist is larger than 1 for rec %i! \a\a"%rec.recid)
+                        rec.badloc = True
+                    print("Distance from loc[0] lat/long is %f"%dist)
+                    print("Hometown candidate %s is in county %s" % (info[1],info[11]))
+
+        with file('json/'+str(rec.recid)+".json",'w') as outfile:
+            outrec = OrderedDict([
+                ('recid',rec.recid)
+                ,('fname',rec.fname)
+                ,('lname',rec.lname)
+                ,('hasphoto',rec.hasphoto)
+                ,('photo',rec.photo)
+                ,('hometown',rec.hometown)
+                ,('latitude',rec.latitude)
+                ,('longitude',rec.longitude)
+                ,('county',rec.county)
+                ,('countyid',rec.countyid)
+                ,('badloc',rec.badloc)
+            ])
+            outdb.append(outrec)
+            json.dump(outrec,outfile)
+            # print(json.dumps(outrec), file=outfile)
+
+doRecs(indb)
 # TODO: shit don't work yo
-outfile = file("ormvdb.json.long",'w')
-print(json.dumps(outdb).replace("},","},\n"),file=outfile) 
-outfile.close()
+# outfile = file("ormvdb.json.long",'w')
+# print(json.dumps(outdb).replace("},","},\n"),file=outfile)
+# outfile.close()
 
 print("All done!\a\a\a")

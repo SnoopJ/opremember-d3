@@ -2,10 +2,26 @@
     border: 1px solid black;
 }
 
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 60%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+    max-width: 775px;
+    min-width: 400px;
+}
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+
 path {
-//  fill: #ccc;
-  stroke: #fff;
-  stroke-width: 0.5px;
+  stroke: #000;
+  stroke-width: 0.15rem;
 }
 
 path:hover {
@@ -13,7 +29,7 @@ path:hover {
 }
 
 .name {
-  fill: red;
+  fill: #00c0ff;
   stroke: black;
 }
 
@@ -23,7 +39,7 @@ path:hover {
 }
 
 .infobox > p {
-  margin: 10px; 
+  margin: 10px;
 }
 
 .name:hover {
@@ -32,9 +48,6 @@ path:hover {
 }
 
 .countygeom {
-  fill: hsl(81,50%,45%);
-}
-
-#mapcontainer {
-  position: absolute;
+  /*fill: hsl(81,50%,45%);*/
+  fill: #eaab00;
 }
