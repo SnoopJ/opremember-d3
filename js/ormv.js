@@ -161,7 +161,7 @@ function doCasualties(casualtyjson) {
     .data(casualtyjson)
     .enter()
     .append("g")
-    .attr("countyid",function(d,i) { return d.countyid } )
+    .attr("countyid",function(d,i) { return zeroFill(d.countyid,3) } )
     .each( function(d,i) {
       var countyid = d.countyid;
       var countycas = d.casualties;
@@ -178,6 +178,21 @@ function doCasualties(casualtyjson) {
     })
   d3.selectAll(".name").filter( function(d) { return d.hasphoto && d.photo }).style("fill","#00ea2e");
   d3.selectAll(".badloc").style("fill","red") // color bad locations red, for now
+  doChoropleth();
+}
+
+function doChoropleth() {
+  var colorscale = d3.scale.threshold()
+    .domain([0,5,10,20,50,100,1046])
+    .range(['#feedde','#fdd0a2','#fdae6b','#fd8d3c','#f16913','#d94801','#8c2d04'])
+  d3.selectAll(".countynames>g")
+    .each( function(d) {
+      d3.select(".countygeom[countyid='"+zeroFill(d.countyid,3) +"']")
+        .style("fill",function() {
+          console.log(d.casualties.length)
+          return colorscale(d.casualties.length);
+        });
+    })
 }
 
 d3.select(self.frameElement).style("height", height + "px");

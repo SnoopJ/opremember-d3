@@ -18,3 +18,5 @@ TopoJSON files prepared with these settings:
 
 `ogr2ogr -f GeoJSON -t_srs crs:84 DC.json cnty2010.shp`  
 ` topojson -o DC.json -p --simplify-proportion 2e-3 -- DC.json`
+
+Choropleth color scale created with help from [Colorbrewer.org](http://colorbrewer2.org/)
