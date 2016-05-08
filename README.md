@@ -9,6 +9,12 @@ Populated place database from US.txt, via [GeoNames.org](http://www.geonames.org
 
 MD geo data from [2010 census boundary maps (county-level)](http://www.mdp.state.md.us/msdc/S5_Map_GIS.shtml), TopoJSON file generated using [ogr2ogr](http://www.gdal.org/ogr2ogr.html) and [TopoJSON](https://github.com/mbostock/topojson):
 
+DC geo data from [opendata.dc.gov](http://opendata.dc.gov/datasets/af488e80c4cc47b8ad788571b7566f2b_13)
+
+TopoJSON files prepared with these settings:
 `# ogr2ogr and topojson need to be in PATH`  
 `ogr2ogr -f GeoJSON -t_srs crs:84 out.json cnty2010.shp`  
-` topojson -o bycounty.json -p --simplify-proportion 2e-2 -- out.json`
+` topojson -o MD.json -p --simplify-proportion 2e-2 -- out.json`
+
+`ogr2ogr -f GeoJSON -t_srs crs:84 DC.json cnty2010.shp`  
+` topojson -o DC.json -p --simplify-proportion 2e-3 -- DC.json`

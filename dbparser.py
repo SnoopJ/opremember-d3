@@ -72,11 +72,11 @@ def warning(*objs):
     print("WARNING: ", *objs, file=sys.stderr)
 
 def getPhoto(rec):
-    rec.hasphoto = bool(rec.find("PHOTO").text)
+    rec.hasphoto = (int(rec.find("PHOTO").text) is 1)
+    print("Record %i hasphoto is %s"%(rec.recid,rec.find("PHOTO").text))
     if not rec.hasphoto :
         print("INFO: no photo for record " + str(rec.recid))
-        rec.photo = "1111.png"
-        return None
+        return "1111.png"
 
     photo = rec.find("photo_x0020_attachments")
 
@@ -191,8 +191,8 @@ def doRecs(db,idx=-1):
         if rec.hometown.strip() in hometownswaps.keys():
             print("Correcting hometown from %s to %s",rec.hometown,hometownswaps[rec.hometown.strip()])
             rec.hometown = hometownswaps[rec.hometown.strip()]
-        rec.longitude = -78.6122
-        rec.latitude = 39.2904
+        rec.longitude = -78
+        rec.latitude = 39
         # TODO: resolve county name with county id, then check against county
         #   that SHOULD resolve duplicate false positives...
         # 10th field in placenames.txt is 3-digit county id

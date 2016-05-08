@@ -52,6 +52,20 @@ d3.json("md.json", function(error, mapdata) {
   }
 });
 
+function showCasualties(checkbox) {
+  var showtype = d3.select("#showcasualties").node().checked && d3.selectAll("input[name='showtype']").filter(function(d){ return this.checked }).node().value;
+  d3.selectAll("circle").style("visibility","hidden");
+  d3.selectAll("circle").filter(function(d,i) {
+    return (showtype === "all") || (showtype === "withphoto" && d.hasphoto) || (showtype === "withoutphoto" && !d.hasphoto) ;
+  }).style("visibility","visible")
+}
+d3.select("#showcasualties").on("change",function() { showCasualties(true) });
+
+d3.selectAll("input[name='showtype']").on("change", function() {
+  d3.select("#showcasualties").node().checked = true;
+  showCasualties();
+});
+
 d3.json("DC.json", function(error, mapdata) {
   svg.append("g").attr("id","DCgeo")
     .selectAll("path")
@@ -125,7 +139,7 @@ function createCircle(d) {
     .attr("transform", function() {
       var lat,lon;
       // "latitude": 38.40481, "longitude": -75.56508
-      if ( d.badloc && d.longitude == -78.6122 ) {
+      if ( d.badloc && d.longitude == -78 ) {
         d.longitude = -78.69971 + Math.random(); // randomly spread out the badlocs that are other states/etc.
         d.latitude = 39 - Math.random();
       }

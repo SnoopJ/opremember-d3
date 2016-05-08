@@ -8799,3 +8799,4 @@
 9671103	The Elms at Germantown	The Elms at Germantown		39.19072	-77.24329	P	PPL	US		MD	031			0	166	171	America/New_York	2014-10-09
 9672381	Potomac Glen	Potomac Glen		39.03144	-77.21226	P	PPL	US		MD	031			0	113	115	America/New_York	2012-06-19
 9672382	The Willows of Potomac	The Willows of Potomac		39.08598	-77.2067	P	PPL	US		MD	031			0	126	124	America/New_York	2012-06-19
+4140963	Washington DC	Washington, D.C.	Ouasinkton,Vashington,Vasingtonas,Vasingtonia,Vašingtonas,WAS,Washington,Washington D. C.,Washington D.C.,Washington DC,Waszyngton,wosingteon D.C.,Ουάσιγκτον,Вашингтон,워싱턴 D.C.	38.89511	-77.03637	P	PPLC	US		DC	001			601723	7	6	America/New_York	2015-01-15
