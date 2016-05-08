@@ -19,7 +19,7 @@ import code
 counties = {
 1:"Allegany",
 3:"Anne Arundel",
-5:"Baltimore County",
+5:"Baltimore( County)?$",
 9:"Calvert",
 11:"Caroline",
 13:"Carroll",
@@ -41,7 +41,8 @@ counties = {
 43:"Washington",
 45:"Wicomico",
 47:"Worcester",
-510:"Baltimore( CITY)?$",
+# 510:"Baltimore( CITY)?$",
+510:"Baltimore City",
 # cheating here just so I can see what else breaks.
 999:"OTHER"
 }
