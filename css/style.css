@@ -47,11 +47,8 @@ path:hover {
   stroke: black;
 }
 
-.countygeom {
+.countygeom,
+.DCgeom {
   /*fill: hsl(81,50%,45%);*/
   fill: #eaab00;
-}
-
-.DCgeom {
-  fill: hsl(81,50%,45%);
 }

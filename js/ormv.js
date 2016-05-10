@@ -44,7 +44,13 @@ d3.json("md.json", function(error, mapdata) {
     .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
     .append("path")
     .attr("d", path)
-    .on('mouseover', function(d,i) { d3.select("#curr").text(d.properties.GEODESC) })
+    .on('mouseover', function(d,i) {
+      var countyid = this.parentNode.getAttribute("countyid");
+      d3.select("#curr").text(
+        d.properties.GEODESC + ", casualties: " +
+        casualtyjson.filter(function(d) { return d.countyid == countyid })[0].casualties.length
+      )
+    })
     .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
   // console.log("Geometry loaded, "+(remaining-1)+" remaining things to do...");
   if(!--remaining) {
@@ -52,14 +58,22 @@ d3.json("md.json", function(error, mapdata) {
   }
 });
 
-function showCasualties(checkbox) {
+function showCasualties() {
   var showtype = d3.select("#showcasualties").node().checked && d3.selectAll("input[name='showtype']").filter(function(d){ return this.checked }).node().value;
   d3.selectAll("circle").style("visibility","hidden");
   d3.selectAll("circle").filter(function(d,i) {
     return (showtype === "all") || (showtype === "withphoto" && d.hasphoto) || (showtype === "withoutphoto" && !d.hasphoto) ;
   }).style("visibility","visible")
 }
-d3.select("#showcasualties").on("change",function() { showCasualties(true) });
+d3.select("#showcasualties").on("change",function() { showCasualties() });
+d3.select("#choropleth").on("change",function() {
+  if (d3.select("#choropleth").node().checked) {
+    doChoropleth();
+  } else {
+    d3.selectAll(".countygeom,.DCgeom").style("fill", null);
+    d3.select(".legendQuant").style("visibility","hidden");
+  }
+});
 
 d3.selectAll("input[name='showtype']").on("change", function() {
   d3.select("#showcasualties").node().checked = true;
@@ -161,7 +175,7 @@ function doCasualties(casualtyjson) {
     .data(casualtyjson)
     .enter()
     .append("g")
-    .attr("countyid",function(d,i) { return d.countyid } )
+    .attr("countyid",function(d,i) { return zeroFill(d.countyid,3) } )
     .each( function(d,i) {
       var countyid = d.countyid;
       var countycas = d.casualties;
@@ -179,5 +193,37 @@ function doCasualties(casualtyjson) {
   d3.selectAll(".name").filter( function(d) { return d.hasphoto && d.photo }).style("fill","#00ea2e");
   d3.selectAll(".badloc").style("fill","red") // color bad locations red, for now
 }
+
+var colorscale;
+function doChoropleth() {
+  colorscale = d3.scale.threshold()
+    .domain([0,5,10,20,50,100,1046])
+    .range(['#feedde','#fdd0a2','#fdae6b','#fd8d3c','#f16913','#d94801','#8c2d04'])
+  d3.selectAll(".countynames>g")
+    .each( function(d) {
+      d3.select(".countygeom[countyid='"+zeroFill(d.countyid,3) +"']")
+        .style("fill",function() {
+          return colorscale(d.casualties.length);
+        });
+    });
+  var DCcas = casualtyjson.filter( function(d) { return d.casualties[0].hometown == "WASHINGTON DC" })[0].casualties.length;
+  d3.select(".DCgeom")
+  .style("fill",function() {
+    return colorscale(DCcas);
+  });
+  var legend = d3.legend.color()
+    .labelFormat(d3.format(".2f"))
+    .useClass(true)
+    .scale(colorscale);
+  svg.select(".legendQuant")
+    .style("visibility","visible")
+    .call(legend);
+  d3.selectAll("rect.swatch").style("fill", function(d) { return d }); // something kinda screwy with the legend library so that this is necessary
+}
+
+  svg.append("g")
+    .attr("class", "legendQuant")
+    .attr("transform", "translate(20,200)")
+    .style("visibility","hidden");
 
 d3.select(self.frameElement).style("height", height + "px");
