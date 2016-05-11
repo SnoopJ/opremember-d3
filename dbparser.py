@@ -8,6 +8,7 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 import json
+from datetime import datetime
 #import binascii
 from base64 import b64decode
 from collections import OrderedDict
@@ -170,6 +171,14 @@ def doRecs(db,idx=-1):
         rec.lname = getTag(rec,"LNAME")
         rec.photo = getPhoto(rec)
         rec.county = getTag(rec,"COUNTY")
+        rec.casdate = getTag(rec,"CASDATE")
+
+        if rec.casdate is not None and rec.casdate.strip().isdigit():
+            print("casdate is %s"%rec.casdate)
+            t = datetime.strptime(rec.casdate.strip(),"%Y%m%d")
+            rec.casdate = (t-datetime(1970,1,1)).total_seconds()*1000 # convert to time since epoch
+        else:
+            rec.casdate = None
 
         recconfirmed = False
         for ctyid,r in ctyregs.iteritems():
@@ -240,6 +249,7 @@ def doRecs(db,idx=-1):
                 ,('county',rec.county)
                 ,('countyid',rec.countyid)
                 ,('badloc',rec.badloc)
+                ,('casdate',rec.casdate)
             ])
             outdb.append(outrec)
             json.dump(outrec,outfile)
