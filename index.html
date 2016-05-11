@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <body>
 
 <div class="showme container-fluid">
@@ -12,7 +13,8 @@
       <input type="checkbox" id="choropleth"><label>Color counties as choropleth</label><BR>
       <label><input type="radio" name="showtype" value="all" checked /> All casualties</label>
       <label><input type="radio" name="showtype" value="withphoto" /> With photo</label>
-      <label><input type="radio" name="showtype" value="withoutphoto" /> Without photo</label>
+      <label><input type="radio" name="showtype" value="withoutphoto" /> Without photo</label><BR>
+      <div id="slider" style="max-width: 500px"></div><div id="year"></div>
     </div>
     <div class="row showme">
         <div class="col-sm-4 showme text-center">
@@ -195,6 +197,8 @@
 <script src="js/d3.v3.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.min.js"></script>
 <script src="js/topojson.v1.min.js"></script>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="js/ormv.js"></script>
 </body>
 </html>
