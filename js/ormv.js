@@ -1,5 +1,5 @@
 $( function() {
-  var remaining = 2; // Global var to trigger post-load processing
+  var remaining = 3; // Global var to trigger post-load processing
   var casualtyjson = {}; // Global var to contain JSON...async grossness
   var fakeImages = false; // Global var, fake images or real ones?
 
@@ -36,16 +36,18 @@ $( function() {
     .attr("viewBox", "0 0 600 400")
 
   $("#slider").slider({
-      value:1969,
+      value:1950,
       min: 1955,
       max: 1975,
       step: 1,
       slide: function( event, ui ) {
-        $("#year").text(ui.value );
+        var numvisible = 0;
         d3.selectAll("circle").style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() >= ui.value ? "visible" : "hidden"; })
+        var numvisible = d3.selectAll("circle").filter( function() { return d3.select(this).style("visibility") == "visible" } ).size(); // probably not ideally performant
+        $("#year").text("Showing casualties on or after " + ui.value + " ("+numvisible+" total)");
       }
     });
-    $("#year").text($("#slider").slider("value"));
+    $("#year").text("Showing casualties on or after " + $("#slider").slider("value"));
   d3.json("md.json", function(error, mapdata) {
     svg.append("g").attr("id","MDgeo")
       .selectAll("path")
@@ -70,6 +72,19 @@ $( function() {
     }
   });
 
+  d3.json("DC.json", function(error, mapdata) {
+    svg.append("g").attr("id","DCgeo")
+      .selectAll("path")
+      .data(topojson.feature(mapdata, mapdata.objects.DCout).features)
+      .enter()
+      .append("g")
+      .classed("DCgeom",true)
+      .append("path")
+      .attr("d", path)
+    if(!--remaining) {
+      doCasualties(casualtyjson);
+    }
+  });
   function showCasualties() {
     var showtype = d3.select("#showcasualties").node().checked && d3.selectAll("input[name='showtype']").filter(function(d){ return this.checked }).node().value;
     d3.selectAll("circle").style("visibility","hidden");
@@ -92,16 +107,6 @@ $( function() {
     showCasualties();
   });
 
-  d3.json("DC.json", function(error, mapdata) {
-    svg.append("g").attr("id","DCgeo")
-      .selectAll("path")
-      .data(topojson.feature(mapdata, mapdata.objects.DCout).features)
-      .enter()
-      .append("g")
-      .classed("DCgeom",true)
-      .append("path")
-      .attr("d", path)
-  });
 
   // d3.json("ormvdb.json", function(e,json) {
   d3.json("bycounty.json", function(e,json) {
