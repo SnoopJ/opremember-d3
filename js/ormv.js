@@ -42,8 +42,23 @@ $( function() {
       step: 1,
       slide: function( event, ui ) {
         var numvisible = 0;
-        d3.selectAll("circle").style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() >= ui.value ? "visible" : "hidden"; })
-        var numvisible = d3.selectAll("circle").filter( function() { return d3.select(this).style("visibility") == "visible" } ).size(); // probably not ideally performant
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", function(d,i) {
+            var show = (new Date(d.casdate)).getUTCFullYear() >= ui.value;
+            if(show) {
+              numvisible++;
+              d3.select(this).style("visibility","visible");
+              return 1;
+            } else {
+              return 0;
+            }
+          })
+          .each("end", function() {
+            d3.select(this).style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() >= ui.value ? "visible" : "hidden"; })
+          })
+        // var numvisible = d3.selectAll("circle").filter( function() { return d3.select(this).style("visibility") == "visible" } ).size(); // probably not ideally performant
         $("#year").text("Showing casualties on or after " + ui.value + " ("+numvisible+" total)");
       }
     });
