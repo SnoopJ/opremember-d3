@@ -63,7 +63,7 @@ $( function() {
       }
     });
     $("#year").text("Showing casualties on or after " + $("#slider").slider("value"));
-  d3.json("/json/MD.json", function(error, mapdata) {
+  d3.json("json/MD.json", function(error, mapdata) {
     svg.append("g").attr("id","MDgeo")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
@@ -87,7 +87,7 @@ $( function() {
     }
   });
 
-  d3.json("/json/DC.json", function(error, mapdata) {
+  d3.json("json/DC.json", function(error, mapdata) {
     svg.append("g").attr("id","DCgeo")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
@@ -123,7 +123,7 @@ $( function() {
   });
 
 
-  d3.json("/json/bycounty.json", function(e,json) {
+  d3.json("json/bycounty.json", function(e,json) {
       casualtyjson = json;
       // console.log("Casualties loaded, "+(remaining-1)+" remaining things to do...");
       if (e) console.log(e)
