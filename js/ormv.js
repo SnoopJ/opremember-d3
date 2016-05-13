@@ -63,20 +63,20 @@ $( function() {
       }
     });
     $("#year").text("Showing casualties on or after " + $("#slider").slider("value"));
-  d3.json("md.json", function(error, mapdata) {
+  d3.json("/json/MD.json", function(error, mapdata) {
     svg.append("g").attr("id","MDgeo")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
       .enter()
       .append("g")
       .classed("countygeom",true)
-      .attr("countyid", function(d) { return d.properties.CNTY2010.substr(2,3) })
+      .attr("countyid", function(d) { return d.properties.COUNTYFP; })
       .append("path")
       .attr("d", path)
       .on('mouseover', function(d,i) {
         var countyid = this.parentNode.getAttribute("countyid");
         d3.select("#curr").text(
-          d.properties.GEODESC + ", casualties: " +
+          d.properties.NAME + ", casualties: " +
           casualtyjson.filter(function(d) { return d.countyid == countyid })[0].casualties.length
         )
       })
@@ -87,10 +87,10 @@ $( function() {
     }
   });
 
-  d3.json("DC.json", function(error, mapdata) {
+  d3.json("/json/DC.json", function(error, mapdata) {
     svg.append("g").attr("id","DCgeo")
       .selectAll("path")
-      .data(topojson.feature(mapdata, mapdata.objects.DCout).features)
+      .data(topojson.feature(mapdata, mapdata.objects.out).features)
       .enter()
       .append("g")
       .classed("DCgeom",true)
@@ -123,8 +123,7 @@ $( function() {
   });
 
 
-  // d3.json("ormvdb.json", function(e,json) {
-  d3.json("bycounty.json", function(e,json) {
+  d3.json("/json/bycounty.json", function(e,json) {
       casualtyjson = json;
       // console.log("Casualties loaded, "+(remaining-1)+" remaining things to do...");
       if (e) console.log(e)
