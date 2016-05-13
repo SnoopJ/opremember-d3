@@ -212,7 +212,7 @@ def doRecs(db, idx=-1):
         rec.latitude = 39.2904
         # TODO: resolve county name with county id, then check against county
         #   that SHOULD resolve duplicate false positives...
-        # 10th field in placenames.txt is 3-digit county id
+        # 10th field in place names file is 3-digit county id
         if rec.hometown is not None:
             # print("Trying to resolve hometown: %s" % rec.hometown )
             loc = getLocation(rec)
