@@ -36,7 +36,7 @@ $( function() {
     .attr("viewBox", "0 0 600 400")
 
   $("#slider").slider({
-      value:1950,
+      value:1975,
       min: 1955,
       max: 1975,
       step: 1,
@@ -46,7 +46,7 @@ $( function() {
           .transition()
           .duration(200)
           .style("opacity", function(d,i) {
-            var show = (new Date(d.casdate)).getUTCFullYear() >= ui.value;
+            var show = (new Date(d.casdate)).getUTCFullYear() <= ui.value;
             if(show) {
               numvisible++;
               d3.select(this).style("visibility","visible");
@@ -56,13 +56,13 @@ $( function() {
             }
           })
           .each("end", function() {
-            d3.select(this).style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() >= ui.value ? "visible" : "hidden"; })
+            d3.select(this).style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() <= ui.value ? "visible" : "hidden"; })
           })
         // var numvisible = d3.selectAll("circle").filter( function() { return d3.select(this).style("visibility") == "visible" } ).size(); // probably not ideally performant
-        $("#year").text("Showing casualties on or after " + ui.value + " ("+numvisible+" total)");
+        $("#year").text("Showing casualties on or before " + ui.value + " ("+numvisible+" total)");
       }
     });
-    $("#year").text("Showing casualties on or after " + $("#slider").slider("value"));
+    $("#year").text("Showing casualties on or before " + $("#slider").slider("value"));
   d3.json("json/MD.json", function(error, mapdata) {
     svg.append("g").attr("id","MDgeo")
       .selectAll("path")
