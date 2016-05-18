@@ -2,6 +2,10 @@
     border: 1px solid black;
 }
 
+.dontshowme {
+    display: none;
+}
+
 .svg-container {
     display: inline-block;
     position: relative;
@@ -9,7 +13,8 @@
     padding-bottom: 60%; /* aspect ratio */
     vertical-align: top;
     overflow: hidden;
-    max-width: 775px;
+    /*max-width: 775px;*/
+    max-width: 1080px;
     min-width: 400px;
 }
 .svg-content-responsive {
