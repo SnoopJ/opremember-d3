@@ -63,6 +63,47 @@ $( function() {
       }
     });
     $("#year").text("Showing casualties on or before " + $("#slider").slider("value"));
+
+  function toBottomOfParent(el) {
+    // SVG z-layering is just draw order, so move to bottom of parentNode
+    // TODO: check if this isn't an SVG element...?
+    el.parentNode.appendChild(el);
+  }
+
+  function zoomCounty(d) {
+    t = d3.select(this);
+    d3.selectAll("circle").style("visibility","hidden");
+    cty = t.attr("countyid")
+    zoomfactor = 4
+    // select this element and its name container sibling
+    var namescontainer = d3.selectAll(".countynames > g[countyid='"+cty+"']");
+    namescontainer.selectAll("circle").style("visibility","visible");
+    t.push( namescontainer[0] );
+    c = path.centroid(d)
+    zoomed = (t.attr("zoom") == 1)
+    c.x = c[0];
+    c.y = c[1];
+    t.each(function() { toBottomOfParent(this); })
+    t.attr("zoom", (zoomed ? zoomfactor : 1))
+    .transition()
+    .duration(500)
+    // This would be simpler than translating twice, but I can't get it to work...
+    // .attr("transform-origin", [c.x,c.y].join(' '))
+    // transform applied right-to-left. So, translate to origin, scale, translate back.
+    // pretty sure the operators are aliases for the matrix transform, which explains this
+    .attr("transform", "translate(" + (c.x) + "," + (c.y) +") " +
+      "scale(" + t.attr("zoom") +") " +
+      "translate(" + [-c.x,-c.y].join(',') + ") "
+    )
+    //
+    // z-index cleanup - after a zoom finishes, all circles should be on top
+    // might also be helpful to use Node.insertBefore() ?
+    // TODO: this can be interrupted, but there should only ever be one zoomed county anyway!
+    .each("end", function() { if (zoomed == false) {
+      d3.selectAll(".names").each( function() { toBottomOfParent(this);} );
+    }})
+  }
+
   d3.json("json/MD.json", function(error, mapdata) {
     svg.append("g").attr("id","MDgeo")
       .selectAll("path")
@@ -71,9 +112,12 @@ $( function() {
       .append("g")
       .classed("countygeom",true)
       .attr("countyid", function(d) { return d.properties.COUNTYFP; })
+      .on('click', zoomCounty)
       .append("path")
       .attr("d", path)
+      .attr("zoom", 1)
       .on('mouseover', function(d,i) {
+        toBottomOfParent(this.parentNode);
         var countyid = this.parentNode.getAttribute("countyid");
         d3.select("#curr").text(
           d.properties.NAME + ", casualties: " +

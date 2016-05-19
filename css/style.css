@@ -13,8 +13,7 @@
     padding-bottom: 60%; /* aspect ratio */
     vertical-align: top;
     overflow: hidden;
-    /*max-width: 775px;*/
-    max-width: 1080px;
+    max-width: 775px;
     min-width: 400px;
 }
 .svg-content-responsive {
@@ -30,7 +29,7 @@ path {
 }
 
 path:hover {
-//  fill: black;
+  stroke: #FF5722;
 }
 
 .name {
@@ -50,6 +49,10 @@ path:hover {
 .name:hover {
   fill: blue;
   stroke: black;
+}
+
+.name {
+  visibility: hidden;
 }
 
 .countygeom,
