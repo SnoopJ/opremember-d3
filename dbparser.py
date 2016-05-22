@@ -52,8 +52,8 @@ ctyregs = {}
 for ctyid, cty in counties.iteritems():
     ctyregs[ctyid] = re.compile(cty, re.IGNORECASE)
 
-DOPHOTOS = False
-# DOPHOTOS = True
+# DOPHOTOS = False
+DOPHOTOS = True
 if not DOPHOTOS:
     print("Skipping photo processing...")
 
@@ -88,15 +88,21 @@ def getPhoto(rec):
         print("An error occurred while processing the 'PHOTO' tag")
         print(sys.exc_info()[0])
 
-    if not rec.hasphoto:
-        print("INFO: no photo for record " + str(rec.recid))
-        rec.photo = "1111.png"
-        return None
+    # if not rec.hasphoto:
+    #     print("INFO: no photo for record " + str(rec.recid))
+    #     rec.photo = "1111.png"
+    #     return None
 
     photo = rec.find("photo_x0020_attachments")
+    # image data for clippings is in the print_... field, but NOT photos (e.g. obits)
+    # clipping = rec.find("print_x0020_attachments")
 
-    if photo is None:
+    # if the bool field and the attachments are in disagreement, print a warning
+    if rec.hasphoto and photo is None:
         print("INFO: Record " + str(rec.recid) + " has a photo listed, but no photo is present in the database.")
+        return None
+    elif not rec.hasphoto and photo is not None:
+        print("INFO: Record " + str(rec.recid) + " has no photo listed, but a photo is present in the database.")
         return None
     else:
         if DOPHOTOS:
@@ -274,10 +280,11 @@ def doRecs(db, idx=-1):
             # print(json.dumps(outrec), file=outfile)
 
 
+
 def main(argv):
     doRecs(indb)
     print("All done!\a\a\a")
 
 
-if __name__ == "main":
-    main()
+if __name__ == "__main__":
+    main(sys.argv)
