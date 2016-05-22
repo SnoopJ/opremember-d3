@@ -1,1 +1,1 @@
-{"recid": 432, "fname": "NORMAN JAMES", "lname": "PEARSON", "hasphoto": true, "photo": "432.png", "hometown": "HERRON", "latitude": 39.2904, "longitude": -78.6122, "county": "WICOMICO", "countyid": 45, "state": "UNKNOWN", "badloc": true}
+{"recid": 432, "fname": "NORMAN JAMES", "lname": "PEARSON", "hasphoto": true, "photo": "432.png", "hometown": "HERRON", "latitude": 39.2904, "longitude": -78.6122, "county": "WICOMICO", "countyid": 45, "stateid": "UNKNOWN", "badloc": true, "casdate": 34905600000.0}

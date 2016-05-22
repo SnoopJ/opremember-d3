@@ -1,1 +1,1 @@
-{"recid": 100, "fname": "ROBERTS PATON", "lname": "BURROWS", "hasphoto": true, "photo": "100.jpg", "hometown": "DENTON", "latitude": 38.88456, "longitude": -75.82716, "county": "CAROLINE", "countyid": 11, "state": "24", "badloc": false}
+{"recid": 100, "fname": "ROBERTS PATON", "lname": "BURROWS", "hasphoto": true, "photo": "100.jpg", "hometown": "DENTON", "latitude": 38.88456, "longitude": -75.82716, "county": "CAROLINE", "countyid": 11, "stateid": "24", "badloc": false, "casdate": 24710400000.0}

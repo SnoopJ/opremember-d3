@@ -1,1 +1,1 @@
-{"recid": 306, "fname": "JOHN WILLIAM", "lname": "GRASER", "hasphoto": true, "photo": "306.png", "hometown": "FREDERICK", "latitude": 39.41427, "longitude": -77.41054, "county": "FREDERICK", "countyid": 21, "state": "24", "badloc": false}
+{"recid": 306, "fname": "JOHN WILLIAM", "lname": "GRASER", "hasphoto": true, "photo": "306.png", "hometown": "FREDERICK", "latitude": 39.41427, "longitude": -77.41054, "county": "FREDERICK", "countyid": 21, "stateid": "24", "badloc": false, "casdate": -50457600000.0}

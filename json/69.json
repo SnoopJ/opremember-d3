@@ -1,1 +1,1 @@
-{"recid": 69, "fname": "JOHN MICHAEL", "lname": "BIONDI", "hasphoto": true, "photo": "69.png", "hometown": "MOUNT RAINIER", "latitude": 38.9415, "longitude": -76.96498, "county": "PRINCE GEORGES", "countyid": 33, "state": "24", "badloc": false}
+{"recid": 69, "fname": "JOHN MICHAEL", "lname": "BIONDI", "hasphoto": true, "photo": "69.png", "hometown": "MOUNT RAINIER", "latitude": 38.9415, "longitude": -76.96498, "county": "PRINCE GEORGES", "countyid": 33, "stateid": "24", "badloc": false, "casdate": -81907200000.0}

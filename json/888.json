@@ -1,1 +1,1 @@
-{"recid": 888, "fname": "THOMAS ALEXANDER", "lname": "SMITH", "hasphoto": true, "photo": "888.png", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "state": "24", "badloc": false}
+{"recid": 888, "fname": "THOMAS ALEXANDER", "lname": "SMITH", "hasphoto": true, "photo": "888.png", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "stateid": "24", "badloc": false, "casdate": -86227200000.0}

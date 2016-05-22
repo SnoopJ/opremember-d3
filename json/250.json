@@ -1,1 +1,1 @@
-{"recid": 250, "fname": "GEORGE LEMUEL", "lname": "ELLIS", "hasphoto": true, "photo": "250.jpg", "hometown": "GLEN ECHO", "latitude": 38.969, "longitude": -77.14248, "county": "MONTGOMERY", "countyid": 31, "state": "24", "badloc": false}
+{"recid": 250, "fname": "GEORGE LEMUEL", "lname": "ELLIS", "hasphoto": true, "photo": "250.jpg", "hometown": "GLEN ECHO", "latitude": 38.969, "longitude": -77.14248, "county": "MONTGOMERY", "countyid": 31, "stateid": "24", "badloc": false, "casdate": -107568000000.0}

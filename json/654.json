@@ -1,1 +1,1 @@
-{"recid": 654, "fname": "THOMAS JOHN", "lname": "MC MAHON", "hasphoto": true, "photo": "654.png", "hometown": "CUMBERLAND", "latitude": 39.64009, "longitude": -78.75696, "county": "ALLEGANY", "countyid": 1, "state": "24", "badloc": false}
+{"recid": 654, "fname": "THOMAS JOHN", "lname": "MC MAHON", "hasphoto": true, "photo": "654.png", "hometown": "CUMBERLAND", "latitude": 39.64009, "longitude": -78.75696, "county": "ALLEGANY", "countyid": 1, "stateid": "24", "badloc": false, "casdate": -72921600000.0}

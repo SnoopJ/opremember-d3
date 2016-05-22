@@ -1,1 +1,1 @@
-{"recid": 500, "fname": "ROBERT BUTLER", "lname": "BUCHANAN", "hasphoto": true, "photo": "500.png", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "state": "24", "badloc": false}
+{"recid": 500, "fname": "ROBERT BUTLER", "lname": "BUCHANAN", "hasphoto": true, "photo": "500.png", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "stateid": "24", "badloc": false, "casdate": -48556800000.0}

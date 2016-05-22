@@ -176,12 +176,11 @@ def setLocation(loc, rec):
         info = (loc[0]).split("\t")
         lat = float(info[4])
         lon = float(info[5])
-        state = info[9]
         # print("(Lat,Long) should be (%f,%f)" % (lat,lon))
         rec.latitude = lat
         rec.longitude = lon
         if info[10].strip() != '':
-            rec.state = info[10].strip()
+            rec.stateid = info[10].strip()
     else:
         print("Hometown (%s) not recovered (recid %s)" % (rec.hometown, rec.recid))
         code.interact(local=dict(globals(), **locals()))
@@ -240,7 +239,7 @@ def doRecs(db, idx=-1):
             rec.badloc = True
         rec.longitude = -78.6122
         rec.latitude = 39.2904
-        rec.state = "UNKNOWN"
+        rec.stateid = "UNKNOWN"
         # TODO: resolve county name with county id, then check against county
         #   that SHOULD resolve duplicate false positives...
         # 10th field in place names file is 3-digit county id
@@ -289,8 +288,9 @@ def doRecs(db, idx=-1):
                 ('longitude', rec.longitude),
                 ('county', rec.county),
                 ('countyid', rec.countyid),
-                ('state', states[rec.state]),
-                ('badloc', rec.badloc)
+                ('stateid', states[rec.stateid]),
+                ('badloc', rec.badloc),
+                ('casdate', rec.casdate)
             ])
             outdb.append(outrec)
             json.dump(outrec, outfile)

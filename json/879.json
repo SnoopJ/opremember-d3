@@ -1,1 +1,1 @@
-{"recid": 879, "fname": "EDGAR ARMSTRONG", "lname": "SMITH", "hasphoto": true, "photo": "879.png", "hometown": "MT VERNON NY", "latitude": 39.2904, "longitude": -78.6122, "county": "OTHER", "countyid": 999, "state": "UNKNOWN", "badloc": true}
+{"recid": 879, "fname": "EDGAR ARMSTRONG", "lname": "SMITH", "hasphoto": true, "photo": "879.png", "hometown": "MT VERNON NY", "latitude": 39.2904, "longitude": -78.6122, "county": "OTHER", "countyid": 999, "stateid": "UNKNOWN", "badloc": true, "casdate": -40521600000.0}

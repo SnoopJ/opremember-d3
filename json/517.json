@@ -1,1 +1,1 @@
-{"recid": 517, "fname": "JOHN ZANG", "lname": "FICKUS", "hasphoto": true, "photo": "517.jpg", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "state": "24", "badloc": false}
+{"recid": 517, "fname": "JOHN ZANG", "lname": "FICKUS", "hasphoto": true, "photo": "517.jpg", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "stateid": "24", "badloc": false, "casdate": -35856000000.0}

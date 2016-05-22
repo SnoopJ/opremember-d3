@@ -1,1 +1,1 @@
-{"recid": 245, "fname": "HARRY LEON", "lname": "ECTON", "hasphoto": true, "photo": "245.png", "hometown": "BOONSBORO", "latitude": 38.95011, "longitude": -75.85994, "county": "WASHINGTON", "countyid": 43, "state": "24", "badloc": true}
+{"recid": 245, "fname": "HARRY LEON", "lname": "ECTON", "hasphoto": true, "photo": "245.png", "hometown": "BOONSBORO", "latitude": 38.95011, "longitude": -75.85994, "county": "WASHINGTON", "countyid": 43, "stateid": "24", "badloc": true, "casdate": -60566400000.0}

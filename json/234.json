@@ -1,1 +1,1 @@
-{"recid": 234, "fname": "WALTER LLOYD", "lname": "DROSD", "hasphoto": true, "photo": "234.jpg", "hometown": "KENSINGTON", "latitude": 39.08317, "longitude": -76.57996, "county": "MONTGOMERY", "countyid": 31, "state": "24", "badloc": false}
+{"recid": 234, "fname": "WALTER LLOYD", "lname": "DROSD", "hasphoto": true, "photo": "234.jpg", "hometown": "KENSINGTON", "latitude": 39.08317, "longitude": -76.57996, "county": "MONTGOMERY", "countyid": 31, "stateid": "24", "badloc": false, "casdate": -50371200000.0}

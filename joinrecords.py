@@ -15,7 +15,7 @@ for f in glob.glob("json/[0-9]*.json"):
         rec = json.loads(infile.read())
         recid = rec['recid']
         countyid = rec['countyid']
-        stateid = rec['state']
+        stateid = rec['stateid']
 
         if stateid not in recsbystate.keys():
             recsbystate[stateid] = {'stateid': stateid, 'counties': {}}

@@ -1,1 +1,1 @@
-{"recid": 513, "fname": "JOHN ENGLISH", "lname": "DAVIS", "hasphoto": false, "photo": null, "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "state": "24", "badloc": false}
+{"recid": 513, "fname": "JOHN ENGLISH", "lname": "DAVIS", "hasphoto": false, "photo": null, "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "stateid": "24", "badloc": false, "casdate": 32832000000.0}
