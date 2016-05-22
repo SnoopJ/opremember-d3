@@ -1,1 +1,1 @@
-{"recid": 307, "fname": "WILLIAM D", "lname": "GRAVES", "hasphoto": false, "photo": "1111.png", "hometown": " FORT HOLABIRD", "latitude": 39, "longitude": -78, "county": "BALTIMORE", "countyid": 5, "badloc": true, "casdate": -94176000000.0}
+{"recid": 307, "fname": "WILLIAM D", "lname": "GRAVES", "hasphoto": true, "photo": "307.jpg", "hometown": "FORT HOLABIRD", "latitude": 39.2904, "longitude": -78.6122, "county": "BALTIMORE", "countyid": 5, "state": "UNKNOWN", "badloc": true}

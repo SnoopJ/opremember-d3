@@ -33,8 +33,15 @@ path:hover {
 }
 
 .name {
+  fill: #00ea2e;
+  stroke: black;
+  visibility: hidden;
+}
+
+.missingphoto {
   fill: #00c0ff;
   stroke: black;
+  visibility: visible;
 }
 
 .infobox {
@@ -49,10 +56,6 @@ path:hover {
 .name:hover {
   fill: blue;
   stroke: black;
-}
-
-.name {
-  visibility: hidden;
 }
 
 .countygeom,

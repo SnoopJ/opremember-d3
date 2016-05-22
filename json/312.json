@@ -1,1 +1,1 @@
-{"recid": 312, "fname": "THOMAS OWEN", "lname": "GREEN", "hasphoto": true, "photo": null, "hometown": " JESSUP", "latitude": 39.14927, "longitude": -76.77525, "county": "HOWARD", "countyid": 27, "badloc": false, "casdate": -129081600000.0}
+{"recid": 312, "fname": "THOMAS OWEN", "lname": "GREEN", "hasphoto": true, "photo": "312.png", "hometown": "JESSUP", "latitude": 39.14927, "longitude": -76.77525, "county": "HOWARD", "countyid": 27, "state": "24", "badloc": false}

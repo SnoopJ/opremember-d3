@@ -1,1 +1,1 @@
-{"recid": 1000, "fname": "ROBERT LEROY", "lname": "WILLARD", "hasphoto": true, "photo": null, "hometown": " FREDERICK", "latitude": 39.41427, "longitude": -77.41054, "county": "FREDERICK", "countyid": 21, "badloc": false, "casdate": 49507200000.0}
+{"recid": 1000, "fname": "ROBERT LEROY", "lname": "WILLARD", "hasphoto": true, "photo": "1000.png", "hometown": "FREDERICK", "latitude": 39.41427, "longitude": -77.41054, "county": "FREDERICK", "countyid": 21, "state": "24", "badloc": false}

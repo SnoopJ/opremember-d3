@@ -1,1 +1,1 @@
-{"recid": 405, "fname": "ROBERT WILLIAM", "lname": "MAZZA", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "badloc": false, "casdate": -80870400000.0}
+{"recid": 405, "fname": "ROBERT WILLIAM", "lname": "MAZZA", "hasphoto": true, "photo": "405.png", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "state": "24", "badloc": false}

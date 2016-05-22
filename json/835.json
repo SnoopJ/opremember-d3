@@ -1,1 +1,1 @@
-{"recid": 835, "fname": "THOMAS JAMES", "lname": "SCHINDLER", "hasphoto": true, "photo": null, "hometown": " BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "badloc": false, "casdate": -133833600000.0}
+{"recid": 835, "fname": "THOMAS JAMES", "lname": "SCHINDLER", "hasphoto": true, "photo": "835.png", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "state": "24", "badloc": false}

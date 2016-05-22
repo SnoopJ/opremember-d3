@@ -1,1 +1,1 @@
-{"recid": 411, "fname": "CHARLES THOMAS", "lname": "MC CORKLE", "hasphoto": true, "photo": null, "hometown": " BRADSHAW", "latitude": 39.42316, "longitude": -76.38107, "county": "BALTIMORE", "countyid": 5, "badloc": false, "casdate": -105494400000.0}
+{"recid": 411, "fname": "CHARLES THOMAS", "lname": "MC CORKLE", "hasphoto": true, "photo": "411.jpg", "hometown": "BRADSHAW", "latitude": 39.42316, "longitude": -76.38107, "county": "BALTIMORE", "countyid": 5, "state": "24", "badloc": false}

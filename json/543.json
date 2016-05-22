@@ -1,1 +1,1 @@
-{"recid": 543, "fname": "JIMMY ARNOLD", "lname": "HILL", "hasphoto": false, "photo": "1111.png", "hometown": " BLADENSBURG", "latitude": 38.93928, "longitude": -76.93386, "county": "PRINCE GEORGES", "countyid": 33, "badloc": false, "casdate": 10368000000.0}
+{"recid": 543, "fname": "JIMMY ARNOLD", "lname": "HILL", "hasphoto": false, "photo": null, "hometown": "BLADENSBURG", "latitude": 38.93928, "longitude": -76.93386, "county": "PRINCE GEORGES", "countyid": 33, "state": "24", "badloc": false}

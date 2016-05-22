@@ -1,1 +1,1 @@
-{"recid": 308, "fname": "CHARLES GONZIE", "lname": "GRAY", "hasphoto": false, "photo": "1111.png", "hometown": " BRANDYWINE", "latitude": 38.69678, "longitude": -76.84775, "county": "PRINCE GEORGES", "countyid": 33, "badloc": false, "casdate": -16761600000.0}
+{"recid": 308, "fname": "CHARLES GONZIE", "lname": "GRAY", "hasphoto": true, "photo": "308.jpg", "hometown": "BRANDYWINE", "latitude": 38.69678, "longitude": -76.84775, "county": "PRINCE GEORGES", "countyid": 33, "state": "24", "badloc": false}

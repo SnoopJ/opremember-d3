@@ -8,16 +8,22 @@ import json
 from collections import OrderedDict
 import re
 
-recsbycounty = {}
+recsbystate = {}
 for f in glob.glob("json/[0-9]*.json"):
     print(f)
     with open(f, 'r') as infile:
         rec = json.loads(infile.read())
         recid = rec['recid']
         countyid = rec['countyid']
+        stateid = rec['state']
+
+        if stateid not in recsbystate.keys():
+            recsbystate[stateid] = {'stateid': stateid, 'counties': {}}
+
+        recsbycounty = recsbystate[stateid]['counties']
         if countyid not in recsbycounty.keys():
             recsbycounty[countyid] = {'countyid': countyid, 'casualties': []}
         recsbycounty[countyid]['casualties'].append(rec)
 
-with open('json/bycounty.json', 'w') as outfile:
-    json.dump([v for k, v in recsbycounty.items()], outfile)
+with open('json/bystate.json', 'w') as outfile:
+    json.dump([v for k, v in recsbystate.items()], outfile)

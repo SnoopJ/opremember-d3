@@ -1,1 +1,1 @@
-{"recid": 3, "fname": "RONALD M", "lname": "ADAMS", "hasphoto": true, "photo": "3.png", "hometown": " CASCADE", "latitude": 39.71093, "longitude": -77.48943, "county": "WASHINGTON", "countyid": 43, "badloc": false, "casdate": -63417600000.0}
+{"recid": 3, "fname": "RONALD M", "lname": "ADAMS", "hasphoto": true, "photo": "3.png", "hometown": "CASCADE", "latitude": 39.71093, "longitude": -77.48943, "county": "WASHINGTON", "countyid": 43, "state": "24", "badloc": false}

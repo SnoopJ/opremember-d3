@@ -1,1 +1,1 @@
-{"recid": 351, "fname": "JOHN FRANKLIN", "lname": "HUTZELL", "hasphoto": true, "photo": null, "hometown": " WILLIAMSPORT", "latitude": 39.60065, "longitude": -77.82055, "county": "WASHINGTON", "countyid": 43, "badloc": false, "casdate": -52790400000.0}
+{"recid": 351, "fname": "JOHN FRANKLIN", "lname": "HUTZELL", "hasphoto": true, "photo": "351.png", "hometown": "WILLIAMSPORT", "latitude": 39.60065, "longitude": -77.82055, "county": "WASHINGTON", "countyid": 43, "state": "24", "badloc": false}

@@ -1,1 +1,1 @@
-{"recid": 146, "fname": "LARRY MONROE", "lname": "CLARK", "hasphoto": true, "photo": null, "hometown": " OLNEY", "latitude": 39.15316, "longitude": -77.06692, "county": "MONTGOMERY", "countyid": 31, "badloc": false, "casdate": -60393600000.0}
+{"recid": 146, "fname": "LARRY MONROE", "lname": "CLARK", "hasphoto": true, "photo": "146.png", "hometown": "OLNEY", "latitude": 39.15316, "longitude": -77.06692, "county": "MONTGOMERY", "countyid": 31, "state": "24", "badloc": false}

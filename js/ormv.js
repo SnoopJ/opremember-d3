@@ -1,6 +1,6 @@
+  var casualtyjson = {}; // Global var to contain JSON...async grossness
 $( function() {
   var remaining = 3; // Global var to trigger post-load processing
-  var casualtyjson = {}; // Global var to contain JSON...async grossness
   var fakeImages = false; // Global var, fake images or real ones?
 
   var width = 712,
@@ -33,7 +33,9 @@ $( function() {
     // .attr("width", width)
     // .attr("height", height)
     .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("viewBox", "0 0 600 400")
+    .attr("viewBox", "0 0 600 400");
+
+  svg.append("g").attr("id","geo");
 
   $("#slider").slider({
       value:1975,
@@ -66,31 +68,50 @@ $( function() {
 
   function toBottomOfParent(el) {
     // SVG z-layering is just draw order, so move to bottom of parentNode
-    // TODO: check if this isn't an SVG element...?
+    // TODO: check if this isn't an SVG element, by crawling upwards in the DOM
     el.parentNode.appendChild(el);
   }
 
+  function isZoomed(el) {
+    return d3.select(el).attr("zoom") > 1;
+  }
+
   function zoomCounty(d) {
+    toBottomOfParent(this.parentNode);
     t = d3.select(this);
     d3.selectAll("circle").style("visibility","hidden");
-    cty = t.attr("countyid")
+    // cty = t.attr("countyid")
+    cty = d.properties.COUNTYFP;
+    state = d.properties.STATEFP;
     zoomfactor = 4
     // select this element and its name container sibling
-    var namescontainer = d3.selectAll(".countynames > g[countyid='"+cty+"']");
+    var namescontainer = d3.selectAll(".countynames > g[countyid='" + cty + "'][stateid='" + state + "']");
     namescontainer.selectAll("circle").style("visibility","visible");
     t.push( namescontainer[0] );
-    c = path.centroid(d)
-    zoomed = (t.attr("zoom") == 1)
+    c = path.centroid(d);
+    console.log(d);
+    console.log(c);
+    zoomed = (t.attr("zoom") == 1);
     c.x = c[0];
     c.y = c[1];
-    t.each(function() { toBottomOfParent(this); })
+    t.each(function() { toBottomOfParent(this); });
     t.attr("zoom", (zoomed ? zoomfactor : 1))
+    .each( function(d) {
+      d3.select(this).selectAll("circle")
+        .attr("zoom", function() { return isZoomed(this) ? 1 : zoomfactor })
+        .transition()
+        .duration(500)
+        .attr("r", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
+          return d3.select(this).attr("r") * (isZoomed(this) ? 1/zoomfactor : zoomfactor);
+        });
+    })
     .transition()
     .duration(500)
     // This would be simpler than translating twice, but I can't get it to work...
     // .attr("transform-origin", [c.x,c.y].join(' '))
     // transform applied right-to-left. So, translate to origin, scale, translate back.
     // pretty sure the operators are aliases for the matrix transform, which explains this
+    // TODO: circles get larger with this scaling, but this is not terribly desireable (transition r to r/zoomfactor to compensate?)
     .attr("transform", "translate(" + (c.x) + "," + (c.y) +") " +
       "scale(" + t.attr("zoom") +") " +
       "translate(" + [-c.x,-c.y].join(',') + ") "
@@ -105,13 +126,16 @@ $( function() {
   }
 
   d3.json("json/MD.json", function(error, mapdata) {
-    svg.append("g").attr("id","MDgeo")
+    svg.select("#geo")
+      .append("g").attr("id","MD")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
       .enter()
       .append("g")
       .classed("countygeom",true)
       .attr("countyid", function(d) { return d.properties.COUNTYFP; })
+      .attr("stateid", function(d) { console.log(d.properties.STATEFP); return d.properties.STATEFP; })
+      .attr("zoom", 1)
       .on('click', zoomCounty)
       .append("path")
       .attr("d", path)
@@ -132,14 +156,22 @@ $( function() {
   });
 
   d3.json("json/DC.json", function(error, mapdata) {
-    svg.append("g").attr("id","DCgeo")
+    svg.select("#geo")
+      // .append("g").attr("id","DC")
+      .append("g")
+      .attr("id","DC")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
       .enter()
       .append("g")
+      .attr("countyid", function(d) { return d.properties.COUNTYFP; })
+      .attr("stateid", function(d) { console.log(d.properties.STATEFP); return d.properties.STATEFP; })
+      .attr("zoom", 1)
+      .on('click', zoomCounty)
       .classed("DCgeom",true)
       .append("path")
       .attr("d", path)
+      .attr("zoom", 1)
     if(!--remaining) {
       doCasualties(casualtyjson);
     }
@@ -167,7 +199,7 @@ $( function() {
   });
 
 
-  d3.json("json/bycounty.json", function(e,json) {
+  d3.json("json/bystate.json", function(e,json) {
       casualtyjson = json;
       // console.log("Casualties loaded, "+(remaining-1)+" remaining things to do...");
       if (e) console.log(e)
@@ -200,11 +232,19 @@ $( function() {
 
   function createCircle(d) {
     // Using createElementNS is necessary, <circle> is not meaningful in the HTML namespace
-    elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg","circle"))
-      .classed("name",true)
-      .classed("badloc",function() { return d.badloc })
+    elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "circle"))
+      .classed("name", true)
+      .classed("missingphoto", function() {
+        if(typeof(d.hasphoto) === "boolean") {
+          return !d.hasphoto;
+        } else {
+          return false;
+        }
+      })
+      .classed("badloc", function() { return d.badloc })
       .attr("recid", d.recid)
-      .attr("r",3)
+      .attr("zoom", 1)
+      .attr("r", 3)
       .attr("transform", function() {
         var lat,lon;
         // "latitude": 38.40481, "longitude": -75.56508
@@ -220,33 +260,35 @@ $( function() {
       })
       .on("mouseover",hoverCircle)
       .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
-      .on("click", clickCircle)
+      .on("click", clickCircle);
     // console.log("Creating circle for record "+d.recid+" with lat/lon ("+d.latitude+","+d.longitude+")")
-    return elem.node()
+    return elem.node();
   }
   function doCasualties(casualtyjson) {
-    svg.append("g").classed("countynames",true)
+    svg.append("g").classed("namescontiner",true)
       .selectAll("g")
       .data(casualtyjson)
       .enter()
       .append("g")
-      .attr("countyid",function(d,i) { return zeroFill(d.countyid,3) } )
+      .attr("stateid", function(d,i) { return d.stateid; })
       .each( function(d,i) {
-        var countyid = d.countyid;
-        var countycas = d.casualties;
+        var stateid = d.stateid;
         d3.select(this)
-        .selectAll(".names")
-        .data(countycas)
+        .selectAll(".countynames")
+        .data(d3.values(d.counties))
         .enter()
-        .append(createCircle)
-      })
-      .data(casualtyjson)
-      .enter( function(d,i) {
-        var cty = zeroFill(d.countyid,3);
-        return cty;
-      })
-    d3.selectAll(".name").filter( function(d) { return d.hasphoto && d.photo }).style("fill","#00ea2e");
-    d3.selectAll(".badloc").style("fill","red") // color bad locations red, for now
+        .append("g")
+        .classed("countynames", true)
+        .attr("countyid", function(d) { return zeroFill(d.countyid,3) })
+        .each( function(d,i) {
+          d3.select(this)
+          .selectAll(".names")
+          .data(d.casualties)
+          .enter()
+          .append(createCircle)
+        })
+      });
+    d3.selectAll(".badloc").style("fill","red"); // color bad locations red, for now
   }
 
   var colorscale;
