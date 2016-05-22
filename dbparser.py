@@ -9,6 +9,7 @@ import sys
 import xml.etree.ElementTree as ET
 import json
 # import binascii
+from datetime import datetime
 from base64 import b64decode
 from collections import OrderedDict
 import re
@@ -51,8 +52,8 @@ ctyregs = {}
 for ctyid, cty in counties.iteritems():
     ctyregs[ctyid] = re.compile(cty, re.IGNORECASE)
 
-# DOPHOTOS = False
-DOPHOTOS = True
+DOPHOTOS = False
+# DOPHOTOS = True
 if not DOPHOTOS:
     print("Skipping photo processing...")
 
@@ -63,6 +64,8 @@ indb = tree.getroot()
 outdb = []
 
 imgdir = 'img'
+jsondir = 'json/'
+[os.makedirs(exportdir) for exportdir in [imgdir, jsondir] if not os.path.exists(exportdir)]
 
 placesfile = file('MDppls.txt', 'r')
 places = placesfile.readlines()
@@ -73,8 +76,18 @@ def warning(*objs):
     print("WARNING: ", *objs, file=sys.stderr)
 
 
+def getRec(indb, recid):
+    r = indb.find("./ormvmasterfile/[REC='" + str(recid) + "']")
+    return r
+
+
 def getPhoto(rec):
-    rec.hasphoto = bool(rec.find("PHOTO").text)
+    try:
+        rec.hasphoto = bool(int(getTag(rec, "PHOTO")))
+    except:
+        print("An error occurred while processing the 'PHOTO' tag")
+        print(sys.exc_info()[0])
+
     if not rec.hasphoto:
         print("INFO: no photo for record " + str(rec.recid))
         rec.photo = "1111.png"
@@ -82,14 +95,11 @@ def getPhoto(rec):
 
     photo = rec.find("photo_x0020_attachments")
 
-    if DOPHOTOS:
-        if photo is None:
-            print("INFO: Record " + str(rec.recid) + " has a photo listed, but no photo is present in the database.")
-            return None
-        else:
-            if not os.path.exists(imgdir):
-                os.makedirs(imgdir)
-
+    if photo is None:
+        print("INFO: Record " + str(rec.recid) + " has a photo listed, but no photo is present in the database.")
+        return None
+    else:
+        if DOPHOTOS:
             try:
                 p = b64decode(photo.find("FileData").text.replace("\n", "").replace("\r", ""))
                 # TODO(?): sanity check here, not all extensions are 3 letters.
@@ -105,8 +115,8 @@ def getPhoto(rec):
             except:
                 warning("Could not decode photo for record " + str(rec.recid))
                 return None
-    else:
-        return "1111.png"
+        else:
+            return "1111.png"
 
 
 def getTag(rec, tag):
@@ -115,16 +125,29 @@ def getTag(rec, tag):
         print("INFO: Tag " + tag + " for record " + str(rec.recid) + "requested, but none found")
         return None
     else:
-        return t.text
+        return t.text.strip()
 
 
 def initRec(rec):
     rec.recid = int(rec.find("REC").text)
     rec.badloc = False
 
+hometownswaps = {
+    'MARLOWE HEIGHTS': 'MARLOW HEIGHTS',
+    'LONACONNG': 'LONACONING',
+    'ROSS NECK': 'CAMBRIDGE',  # there is no place called ROSS NECK, but there's a Rossneck airport in Cambridge...
+    'WEST HYATTSVILLE': 'HYATTSVILLE',
+    'MOUNT RANIER': 'MOUNT RAINIER',
+    'WHALEYSVILLE': 'WHALEYVILLE'
+}
 
 def getLocation(rec):
-    r = re.compile("^[^\t]+\t" + re.escape(rec.hometown.lstrip()), re.IGNORECASE)
+    hometown = rec.hometown
+    if hometown in hometownswaps.keys():
+        print("Hometown listed as %s, locating using %s instead" % (hometown, hometownswaps[hometown]))
+        hometown = hometownswaps[hometown]
+        print("Rec.hometown is now %s" % rec.hometown)
+    r = re.compile("^[^\t]+\t" + re.escape(hometown), re.IGNORECASE)
     res = []
     for p in places:
         if r.search(p) is not None:
@@ -151,14 +174,6 @@ def fixRecLocation(newlocname, rec):
     newloc = getLocation(rec)
     parseLocation(newloc, rec)
 
-hometownswaps = {
-    'MARLOWE HEIGHTS': 'MARLOW HEIGHTS',
-    'LONACONNG': 'LONACONING',
-    'ROSS NECK': 'CAMBRIDGE',  # there is no place called ROSS NECK, but there's a Rossneck airport in Cambridge...
-    'WEST HYATTSVILLE': 'HYATTSVILLE',
-    'MOUNT RANIER': 'MOUNT RAINIER',
-    'WHALEYSVILLE': 'WHALEYVILLE'
-}
 
 
 def doRecs(db, idx=-1):
@@ -180,7 +195,7 @@ def doRecs(db, idx=-1):
 
         rec.casdate = getTag(rec, "CASDATE")
 
-        if rec.casdate is not None and rec.casdate.strip().isdigit():
+        if rec.casdate is not None and rec.casdate.isdigit():
             print("casdate is %s" % rec.casdate)
             t = datetime.strptime(rec.casdate.strip(), "%Y%m%d")
             rec.casdate = (t - datetime(1970, 1, 1)).total_seconds() * 1000  # convert to time since epoch
@@ -205,9 +220,6 @@ def doRecs(db, idx=-1):
         if rec.hometown is None:
             rec.hometown = '?'
             rec.badloc = True
-        if rec.hometown.strip() in hometownswaps.keys():
-            print("Correcting hometown from %s to %s", rec.hometown, hometownswaps[rec.hometown.strip()])
-            rec.hometown = hometownswaps[rec.hometown.strip()]
         rec.longitude = -78.6122
         rec.latitude = 39.2904
         # TODO: resolve county name with county id, then check against county
@@ -243,7 +255,7 @@ def doRecs(db, idx=-1):
                     print("Distance from loc[0] lat/long is %f" % dist)
                     print("Hometown candidate %s is in county %s" % (info[1], info[11]))
 
-        with file('json/' + str(rec.recid) + ".json", 'w') as outfile:
+        with file(jsondir + str(rec.recid) + ".json", 'w') as outfile:
             outrec = OrderedDict([
                 ('recid', rec.recid),
                 ('fname', rec.fname),
@@ -261,10 +273,11 @@ def doRecs(db, idx=-1):
             json.dump(outrec, outfile)
             # print(json.dumps(outrec), file=outfile)
 
-doRecs(indb)
-# TODO: shit don't work yo
-# outfile = file("ormvdb.json.long",'w')
-# print(json.dumps(outdb).replace("},","},\n"),file=outfile)
-# outfile.close()
 
-print("All done!\a\a\a")
+def main(argv):
+    doRecs(indb)
+    print("All done!\a\a\a")
+
+
+if __name__ == "main":
+    main()
