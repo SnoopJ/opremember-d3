@@ -1,7 +1,6 @@
   var casualtyjson = {}; // Global var to contain JSON...async grossness
 $( function() {
   var remaining = 3; // Global var to trigger post-load processing
-  var fakeImages = false; // Global var, fake images or real ones?
 
   var width = 712,
       height = 400;
@@ -22,7 +21,6 @@ $( function() {
 
   var projection = d3.geo.mercator()
     .center([-77,37+50/60])
-      // TODO: scale with svg...somehow.
     .scale(7000)
     .translate([width/2,height*0.9])
 
@@ -30,8 +28,6 @@ $( function() {
       .projection(projection);
 
   var svg = d3.select("#mdmap")
-    // .attr("width", width)
-    // .attr("height", height)
     .attr("preserveAspectRatio", "xMinYMin meet")
     .attr("viewBox", "0 0 600 400");
 
@@ -60,7 +56,6 @@ $( function() {
           .each("end", function() {
             d3.select(this).style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() <= ui.value ? "visible" : "hidden"; })
           })
-        // var numvisible = d3.selectAll("circle").filter( function() { return d3.select(this).style("visibility") == "visible" } ).size(); // probably not ideally performant
         $("#year").text("Showing casualties on or before " + ui.value + " ("+numvisible+" total)");
       }
     });
@@ -80,7 +75,6 @@ $( function() {
     toBottomOfParent(this.parentNode);
     t = d3.select(this);
     d3.selectAll("circle").style("visibility","hidden");
-    // cty = t.attr("countyid")
     cty = d.properties.COUNTYFP;
     state = d.properties.STATEFP;
     zoomfactor = 4
@@ -145,11 +139,10 @@ $( function() {
         var countyid = this.parentNode.getAttribute("countyid");
         d3.select("#curr").text(
           d.properties.NAME + ", casualties: " +
-          casualtyjson.filter(function(d) { return d.countyid == countyid })[0].casualties.length
+          d3.selectAll(".countynames[countyid='" + countyid + "'] > circle").size()
         )
       })
       .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
-    // console.log("Geometry loaded, "+(remaining-1)+" remaining things to do...");
     if(!--remaining) {
       doCasualties(casualtyjson);
     }
@@ -157,7 +150,6 @@ $( function() {
 
   d3.json("json/DC.json", function(error, mapdata) {
     svg.select("#geo")
-      // .append("g").attr("id","DC")
       .append("g")
       .attr("id","DC")
       .selectAll("path")
@@ -201,10 +193,8 @@ $( function() {
 
   d3.json("json/bystate.json", function(e,json) {
       casualtyjson = json;
-      // console.log("Casualties loaded, "+(remaining-1)+" remaining things to do...");
       if (e) console.log(e)
       if(!--remaining) {
-          // console.log("call doCasualties()");
           doCasualties(casualtyjson);
       }
   })
@@ -227,7 +217,6 @@ $( function() {
     d3.select("#COUNTY").text(d.county);
     var casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
     d3.select("#CASDATE").text(casdate);
-    // animate a slide-in
   }
 
   function createCircle(d) {
@@ -247,7 +236,6 @@ $( function() {
       .attr("r", 3)
       .attr("transform", function() {
         var lat,lon;
-        // "latitude": 38.40481, "longitude": -75.56508
         if ( d.badloc && d.longitude == -78 ) {
           d.longitude = -78.69971 + Math.random(); // randomly spread out the badlocs that are other states/etc.
           d.latitude = 39 - Math.random();
@@ -261,7 +249,6 @@ $( function() {
       .on("mouseover",hoverCircle)
       .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
       .on("click", clickCircle);
-    // console.log("Creating circle for record "+d.recid+" with lat/lon ("+d.latitude+","+d.longitude+")")
     return elem.node();
   }
   function doCasualties(casualtyjson) {
