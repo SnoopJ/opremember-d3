@@ -1,4 +1,10 @@
   var casualtyjson = {}; // Global var to contain JSON...async grossness
+  var casualtyFilters = {
+    bytime: function() { return true; },
+    bycounty: function() { return true; },
+    bystate: function() { return true; },
+    byphoto: function() { return true; }
+  };
 $( function() {
   var remaining = 3; // Global var to trigger post-load processing
 
@@ -36,30 +42,25 @@ $( function() {
   $("#slider").slider({
       value:1975,
       min: 1955,
-      max: 1975,
+      max: 1990,
       step: 1,
       slide: function( event, ui ) {
-        var numvisible = 0;
-        d3.selectAll("circle")
-          .transition()
-          .duration(200)
-          .style("opacity", function(d,i) {
-            var show = (new Date(d.casdate)).getUTCFullYear() <= ui.value;
-            if(show) {
-              numvisible++;
-              d3.select(this).style("visibility","visible");
-              return 1;
-            } else {
-              return 0;
-            }
-          })
-          .each("end", function() {
-            d3.select(this).style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() <= ui.value ? "visible" : "hidden"; })
-          })
-        $("#year").text("Showing casualties on or before " + ui.value + " ("+numvisible+" total)");
+        casualtyFilters.bytime = function(d) { return (new Date(d.casdate)).getUTCFullYear() <= ui.value; };
+        var numvisible = filterCasualties().size();
       }
     });
-    $("#year").text("Showing casualties on or before " + $("#slider").slider("value"));
+
+  filterCasualties = function() {
+    var filters = d3.values(casualtyFilters);
+    var casualtiesToShow = d3.selectAll("circle.name")
+    for(var i=0; i<filters.length; i++) {
+      casualtiesToShow = casualtiesToShow.filter( function(d) { return filters[i](d); } );
+    }
+    d3.selectAll("circle").style("visibility", "hidden");
+    casualtiesToShow.style("visibility", "visible");
+    $("#year").text("Showing casualties on or before " + $("#slider").slider("value") + " (" + casualtiesToShow.size() + " total)");
+    return casualtiesToShow;
+  }
 
   function toBottomOfParent(el) {
     // SVG z-layering is just draw order, so move to bottom of parentNode
@@ -74,22 +75,25 @@ $( function() {
   function zoomCounty(d) {
     toBottomOfParent(this.parentNode);
     t = d3.select(this);
-    d3.selectAll("circle").style("visibility","hidden");
-    cty = d.properties.COUNTYFP;
-    state = d.properties.STATEFP;
+    countyid = d.properties.COUNTYFP;
+    stateid = d.properties.STATEFP;
     zoomfactor = 4
     // select this element and its name container sibling
-    var namescontainer = d3.selectAll(".countynames > g[countyid='" + cty + "'][stateid='" + state + "']");
-    namescontainer.selectAll("circle").style("visibility","visible");
-    t.push( namescontainer[0] );
+    if (isZoomed(this)) {
+      casualtyFilters.bycounty = function(d) { return true };
+      casualtyFilters.bystate = function(d) { return true; };
+    } else {
+      casualtyFilters.bycounty = function(d) { return zeroFill(d.countyid,3) === zeroFill(countyid,3); };
+      casualtyFilters.bystate = function(d) { return d.stateid === stateid; };
+    }
+    filterCasualties();
+    var names = d3.select(".namescontainer > g[stateid='" + stateid + "'] > .countynames[countyid='" + countyid + "']");
+    t.push( names[0] );
     c = path.centroid(d);
-    console.log(d);
-    console.log(c);
-    zoomed = (t.attr("zoom") == 1);
     c.x = c[0];
     c.y = c[1];
     t.each(function() { toBottomOfParent(this); });
-    t.attr("zoom", (zoomed ? zoomfactor : 1))
+    t.attr("zoom", (isZoomed(this) ? 1 : zoomfactor))
     .each( function(d) {
       d3.select(this).selectAll("circle")
         .attr("zoom", function() { return isZoomed(this) ? 1 : zoomfactor })
@@ -114,7 +118,7 @@ $( function() {
     // z-index cleanup - after a zoom finishes, all circles should be on top
     // might also be helpful to use Node.insertBefore() ?
     // TODO: this can be interrupted, but there should only ever be one zoomed county anyway!
-    .each("end", function() { if (zoomed == false) {
+    .each("end", function() { if (!isZoomed(this)) {
       d3.selectAll(".names").each( function() { toBottomOfParent(this);} );
     }})
   }
@@ -128,7 +132,7 @@ $( function() {
       .append("g")
       .classed("countygeom",true)
       .attr("countyid", function(d) { return d.properties.COUNTYFP; })
-      .attr("stateid", function(d) { console.log(d.properties.STATEFP); return d.properties.STATEFP; })
+      .attr("stateid", function(d) { return d.properties.STATEFP; })
       .attr("zoom", 1)
       .on('click', zoomCounty)
       .append("path")
@@ -157,7 +161,7 @@ $( function() {
       .enter()
       .append("g")
       .attr("countyid", function(d) { return d.properties.COUNTYFP; })
-      .attr("stateid", function(d) { console.log(d.properties.STATEFP); return d.properties.STATEFP; })
+      .attr("stateid", function(d) { return d.properties.STATEFP; })
       .attr("zoom", 1)
       .on('click', zoomCounty)
       .classed("DCgeom",true)
@@ -169,11 +173,20 @@ $( function() {
     }
   });
   function showCasualties() {
-    var showtype = d3.select("#showcasualties").node().checked && d3.selectAll("input[name='showtype']").filter(function(d){ return this.checked }).node().value;
-    d3.selectAll("circle").style("visibility","hidden");
-    d3.selectAll("circle").filter(function(d,i) {
-      return (showtype === "all") || (showtype === "withphoto" && d.hasphoto) || (showtype === "withoutphoto" && !d.hasphoto) ;
-    }).style("visibility","visible")
+    var showtype = d3.select("#showcasualties").node().checked &&
+      d3.selectAll("input[name='showtype']").filter(function(d){
+        return this.checked
+      }).node().value;
+    casualtyFilters.byphoto = function(d) {
+      if(showtype === false) {
+        return false;
+      } else if(showtype === "all") {
+        return true;
+      } else {
+        return showtype === "withphoto" ? d.hasphoto : !d.hasphoto;
+      }
+    };
+    filterCasualties();
   }
   d3.select("#showcasualties").on("change",function() { showCasualties() });
   d3.select("#choropleth").on("change",function() {
@@ -252,7 +265,7 @@ $( function() {
     return elem.node();
   }
   function doCasualties(casualtyjson) {
-    svg.append("g").classed("namescontiner",true)
+    svg.append("g").classed("namescontainer",true)
       .selectAll("g")
       .data(casualtyjson)
       .enter()
@@ -276,6 +289,7 @@ $( function() {
         })
       });
     d3.selectAll(".badloc").style("fill","red"); // color bad locations red, for now
+    filterCasualties();
   }
 
   var colorscale;
