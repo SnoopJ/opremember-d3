@@ -8,6 +8,7 @@
 $( function() {
   var remaining = 3; // Global var to trigger post-load processing
 
+  var casboxTimeout;
   var width = 712,
       height = 400;
 
@@ -204,7 +205,7 @@ $( function() {
   });
 
 
-  d3.json("json/bystate.json", function(e,json) {
+  d3.json("json/flatdb.json", function(e,json) {
       casualtyjson = json;
       if (e) console.log(e)
       if(!--remaining) {
@@ -213,19 +214,38 @@ $( function() {
   })
 
   function hoverCircle(d){
+    var e,casbox, casdate;
     d3.select("#curr")
       .text(d.lname + ", " + d.fname +
         "  ; HOMETOWN: " + d.hometown +
-        " (county: " + d.county + " )" )
+        " (county: " + d.county + " )"
+      );
+    e = d3.event;
+    clearTimeout(casboxTimeout);
+    casbox = d3.select(".casbox")
+      .style({ display: null })
+      .transition()
+      .duration(500)
+      .style({
+        left: e.clientX + 30 + "px",
+        top: e.clientY + "px",
+        opacity: 1.0
+      });
+
+    casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
+    casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
+    d3.select("#caspic > img").attr("src", "img/" + ( d.hasphoto && d.photo ? d.photo : "1111.png"));
+    casbox.select("#CASDATE").text(casdate);
+    casbox.select("#COUNTY").text(function(){ return d.county });
   }
 
   function clickCircle(d) {
-    d3.selectAll("#casualtyinfo>.row>div.text-left").text("")
-    d3.select("#cas-name").text(d.fname + " " + d.lname);
+    d3.selectAll("#casualtyinfo > .row > div.text-left").text("")
+    d3.select("#casname").text(d.fname + " " + d.lname);
     if (d.hasphoto && d.photo) {
-      d3.select("#cas-pic").select("img").attr("src","img/"+d.photo);
+      d3.select("#caspic").select("img").attr("src","img/"+d.photo);
     } else {
-      d3.select("#cas-pic").select("img").attr("src","img/1111.png");
+      d3.select("#caspic").select("img").attr("src","img/1111.png");
     }
     d3.select("#COUNTY").text(d.county);
     var casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
@@ -260,30 +280,44 @@ $( function() {
         return "translate("+ proj[0] +"," + proj[1] + ")"
       })
       .on("mouseover",hoverCircle)
-      .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
+      .on("mouseout", function(d,i) {
+        d3.select("#curr").text(defaulttext);
+        casboxTimeout = setTimeout( function() {
+          d3.select(".casbox")
+            .transition()
+            .duration(500)
+            .style({ opacity: 0.0 })
+            .transition()
+            .style({ display: "none" });
+        }, 1000);
+      })
       .on("click", clickCircle);
     return elem.node();
   }
   function doCasualties(casualtyjson) {
+    reshape = d3.nest()
+      .key(function(d){ return d.stateid })
+      .key(function(d) { return d.countyid })
+      .entries(casualtyjson);
     svg.append("g").classed("namescontainer",true)
       .selectAll("g")
-      .data(casualtyjson)
+      .data(reshape)
       .enter()
       .append("g")
-      .attr("stateid", function(d,i) { return d.stateid; })
+      .attr("stateid", function(d,i) { return d.key; })
       .each( function(d,i) {
-        var stateid = d.stateid;
+        var stateid = d.key;
         d3.select(this)
         .selectAll(".countynames")
-        .data(d3.values(d.counties))
+        .data(d3.values(d.values))
         .enter()
         .append("g")
         .classed("countynames", true)
-        .attr("countyid", function(d) { return zeroFill(d.countyid,3) })
+        .attr("countyid", function(d) { return zeroFill(d.key,3) })
         .each( function(d,i) {
           d3.select(this)
           .selectAll(".names")
-          .data(d.casualties)
+          .data(d.values)
           .enter()
           .append(createCircle)
         })

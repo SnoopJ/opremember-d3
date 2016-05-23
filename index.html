@@ -19,170 +19,6 @@
       <div id="slider" style="max-width: 500px"></div><div id="year"></div>
     </div>
     <div class="row showme">
-        <div class="col-sm-4 dontshowme text-center">
-            <span>control panel</span>
-            <div id="casualtyinfo"> <!-- overflow y scroll? -->
-                <!-- row template
-                <div class="row">
-                    <div class="showme col-sm-6 text-right"><b>Field Name:</b></div>
-                    <div id="cas-name" class="showme col-sm-6 text-left">Field Value</div>
-                </div> -->
-                <!-- photo -->
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Casualty picture:</b></div>
-                        <div id="cas-pic" class="showme col-sm-6"><img src="img/1111.png" style="width:95%"/></div>
-                    </div>
-                <!-- vitals -->
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Name</b></div>
-                        <div id="cas-name" class="showme col-sm-6 text-left">John Doe</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>Age</b></div>
-                        <div id="AGE" class="hidden col-sm-6 text-left">18</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Birthdate</b></div>
-                        <div id="BIRDATE" class="showme col-sm-6 text-left">01/01/1950</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Casualty date</b></div>
-                        <div id="CASDATE" class="showme col-sm-6 text-left">01/01/1968</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Panel</b></div>
-                        <div id="PANL" class="showme col-sm-6 text-left">1A</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Line</b></div>
-                        <div id="LINE" class="showme col-sm-6 text-left">001</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Buried at</b></div>
-                        <div id="BURIED_x0020_AT" class="showme col-sm-6 text-left">Arlington National Cemetary</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6 text-right"><b>COUNTY</b></div>
-                        <div id="COUNTY" class="col-sm-6 text-left">COUNTY</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Attended school</b></div>
-                        <div id="SCHOOL_x002F_YR" class="showme col-sm-6 text-left">Generic High School - 67</div>
-                    </div>
-                <div class="row">&nbsp;</div>
-                <!-- service information -->
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Service</b></div>
-                        <div id="SVC" class="showme col-sm-6 text-left">SVC</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Tour date</b></div>
-                        <div id="TOURD" class="showme col-sm-6 text-left">TOURD</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>UNIT</b></div>
-                        <div id="UNIT" class="showme col-sm-6 text-left">UNIT</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Company</b></div>
-                        <div id="COMP" class="showme col-sm-6 text-left">A</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>MOS</b></div>
-                        <div id="MOS" class="showme col-sm-6 text-left">MOS</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>GRADE</b></div>
-                        <div id="GRADE" class="showme col-sm-6 text-left">GRADE</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>IDNO</b></div>
-                        <div id="IDNO" class="showme col-sm-6 text-left">IDNO</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>LSVC</b></div>
-                        <div id="LSVC" class="showme col-sm-6 text-left">LSVC</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>MAR</b></div>
-                        <div id="MAR" class="showme col-sm-6 text-left">MAR</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Rank</b></div>
-                        <div id="RANK" class="showme col-sm-6 text-left">PFC</div>
-                    </div>
-                <div class="row">&nbsp;</div>
-                <!-- misc -->
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>BODY</b></div>
-                        <div id="BODY" class="hidden col-sm-6 text-left">BODY</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>CAS1</b></div>
-                        <div id="CAS1" class="hidden col-sm-6 text-left">CAS1</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>CAS2</b></div>
-                        <div id="CAS2" class="hidden col-sm-6 text-left">CAS2</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>CAS3</b></div>
-                        <div id="CAS3" class="hidden col-sm-6 text-left">CAS3</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>CIT</b></div>
-                        <div id="CIT" class="hidden col-sm-6 text-left">CIT</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Comments</b></div>
-                        <div id="COMMENTS" class="showme col-sm-6 text-left">N/A</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Country of death</b></div>
-                        <div id="CTRY" class="showme col-sm-6 text-left">North Vietnam</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Hometown</b></div>
-                        <div id="HOME" class="showme col-sm-6 text-left">Washington D.C.</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>NPA</b></div>
-                        <div id="NPA" class="showme col-sm-6 text-left">NPA</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>PDATE</b></div>
-                        <div id="PDATE" class="showme col-sm-6 text-left">PDATE</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>PID</b></div>
-                        <div id="PID" class="showme col-sm-6 text-left">PID</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Province of death</b></div>
-                        <div id="PROV" class="showme col-sm-6 text-left">PROV</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>Race</b></div>
-                        <div id="RACE" class="hidden col-sm-6 text-left">RACE</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>REC</b></div>
-                        <div id="REC" class="hidden col-sm-6 text-left">REC</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>REFNO</b></div>
-                        <div id="REFNO" class="hidden col-sm-6 text-left">REFNO</div>
-                    </div>
-                    <div class="row">
-                        <div class="hidden col-sm-6 text-right"><b>REL</b></div>
-                        <div id="REL" class="hidden col-sm-6 text-left">REL</div>
-                    </div>
-                    <div class="row">
-                        <div class="showme col-sm-6 text-right"><b>Search information (merge w/ comments?)</b></div>
-                        <div id="SEARCH_x0020_DETAILS" class="showme col-sm-6 text-left">Name is misspelled in official record</div>
-                    </div>
-            </div>
-        </div>
         <div class="col-sm-12 showme text-center">
             <div class="row showme text-center svg-container">
                 <span>map of maryland</span><BR>
@@ -194,6 +30,36 @@
             </div> -->
         </div>
     </div>
+</div>
+<div class="container casbox">
+  <div class="col-sm-12 text-center">
+      <span>control panel</span>
+      <div id="casualtyinfo"> <!-- overflow y scroll? -->
+          <!-- row template
+          <div class="row">
+              <div class="showme col-sm-6 text-right"><b>Field Name:</b></div>
+              <div id="cas-name" class="showme col-sm-6 text-left">Field Value</div>
+          </div> -->
+          <!-- photo -->
+              <div class="row">
+                  <div class="showme col-sm-6 text-right"><b>Casualty picture:</b></div>
+                  <div id="caspic" class="showme col-sm-6"><img src="img/1111.png" style="width:95%"/></div>
+              </div>
+          <!-- vitals -->
+              <div class="row">
+                  <div class="showme col-sm-6 text-right"><b>Name</b></div>
+                  <div id="casname" class="showme col-sm-6 text-left">John Doe</div>
+              </div>
+              <div class="row">
+                  <div class="showme col-sm-6 text-right"><b>Casualty date</b></div>
+                  <div id="CASDATE" class="showme col-sm-6 text-left">01/01/1968</div>
+              </div>
+              <div class="row">
+                  <div class="col-sm-6 text-right"><b>COUNTY</b></div>
+                  <div id="COUNTY" class="col-sm-6 text-left">COUNTY</div>
+              </div>
+      </div>
+  </div>
 </div>
 <script src="js/d3.v3.min.js"></script>
 <script src="js/d3-legend.min.js"></script>
