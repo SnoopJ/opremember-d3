@@ -51,6 +51,18 @@ $( function() {
       }
     });
 
+  animateCasualties = function() {
+    d3.timer( function(t) {
+      var dt = 50;
+      var numsteps = 40*12;
+      if (t > dt*numsteps) {
+        return true;
+      }
+      $("#slider").slider("value",Math.floor(t/dt));
+      filterCasualties();
+    });
+  };
+
   filterCasualties = function() {
     var sliderVal = $("#slider").slider("value");
     casualtyFilters.filterDate = (new Date(1955 + Math.floor(sliderVal/12),sliderVal%12 + 1,1));
@@ -328,6 +340,11 @@ $( function() {
         })
       });
     d3.selectAll(".badloc").style("fill","red"); // color bad locations red, for now
+    d3.select(".controls")
+      .append("input")
+      .attr("type","button")
+      .attr("value","Animate")
+      .on("click", animateCasualties);
     filterCasualties();
   }
 
