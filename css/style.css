@@ -13,12 +13,13 @@
     padding-bottom: 60%; /* aspect ratio */
     vertical-align: top;
     overflow: hidden;
-    max-width: 775px;
+    /*max-width: 775px;*/
     min-width: 400px;
 }
 .svg-content-responsive {
     display: inline-block;
     position: absolute;
+    max-height: 650px;
     top: 10px;
     left: 0;
 }

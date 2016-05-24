@@ -2,7 +2,7 @@
   var casualtyFilters = {
     // bytime: function() { return true; },
     bytime: function(d) { return d.casdate <= casualtyFilters.filterDate; },
-    filterDate: (new Date(1955,1,1)),
+    filterDate: (new Date(1962,1,1)),
     bycounty: function() { return true; },
     bystate: function() { return true; },
     byphoto: function() { return true; },
@@ -42,9 +42,9 @@ $( function() {
   svg.append("g").attr("id","geo");
 
   $("#slider").slider({
-      value: 12*20,
+      value: 12*(1968-1962),
       min: 0,
-      max: 12*40,
+      max: 12*(1989-1962),
       step: 1,
       slide: function( event, ui ) {
         var numvisible = filterCasualties().size();
@@ -65,7 +65,8 @@ $( function() {
 
   filterCasualties = function() {
     var sliderVal = $("#slider").slider("value");
-    casualtyFilters.filterDate = (new Date(1955 + Math.floor(sliderVal/12),sliderVal%12 + 1,1));
+    // TODO: change 1962 from hardcoded to query against slider.min property
+    casualtyFilters.filterDate = (new Date(1962 + Math.floor(sliderVal/12),sliderVal%12 + 1,1));
     var filters = d3.values(casualtyFilters);
     var casualtiesToShow = d3.selectAll("circle.name")
     for(var i=0; i<filters.length; i++) {
@@ -74,6 +75,7 @@ $( function() {
       }
       casualtiesToShow = casualtiesToShow.filter( function(d) { return filters[i](d); } );
     }
+    // TODO: fade
     d3.selectAll("circle").style("visibility", "hidden");
     casualtiesToShow.style("visibility", "visible");
     $("#year").text("Showing casualties on or before " + casualtyFilters.filterDate.toDateString() + " (" + casualtiesToShow.size() + " total)");
@@ -252,8 +254,8 @@ $( function() {
     casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
     casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
     d3.select("#caspic > img").attr("src", "img/" + ( d.hasphoto && d.photo ? d.photo : "1111.png"));
-    casbox.select("#CASDATE").text(casdate);
-    casbox.select("#COUNTY").text(function(){ return d.county });
+    casbox.select("#casdate").text(casdate);
+    casbox.select("#hometown").text(function(){ return d.hometown });
   }
 
   function clickCircle(d) {
