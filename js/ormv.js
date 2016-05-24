@@ -1,13 +1,14 @@
   var casualtyjson = {}; // Global var to contain JSON...async grossness
   var casualtyFilters = {
-    bytime: function() { return true; },
+    // bytime: function() { return true; },
+    bytime: function(d) { return d.casdate <= casualtyFilters.filterDate; },
+    filterDate: (new Date(1955,1,1)),
     bycounty: function() { return true; },
     bystate: function() { return true; },
-    byphoto: function() { return true; }
+    byphoto: function() { return true; },
   };
 $( function() {
   var remaining = 3; // Global var to trigger post-load processing
-
   var casboxTimeout;
   var width = 712,
       height = 400;
@@ -41,25 +42,29 @@ $( function() {
   svg.append("g").attr("id","geo");
 
   $("#slider").slider({
-      value:1975,
-      min: 1955,
-      max: 1990,
+      value: 12*20,
+      min: 0,
+      max: 12*40,
       step: 1,
       slide: function( event, ui ) {
-        casualtyFilters.bytime = function(d) { return (new Date(d.casdate)).getUTCFullYear() <= ui.value; };
         var numvisible = filterCasualties().size();
       }
     });
 
   filterCasualties = function() {
+    var sliderVal = $("#slider").slider("value");
+    casualtyFilters.filterDate = (new Date(1955 + Math.floor(sliderVal/12),sliderVal%12 + 1,1));
     var filters = d3.values(casualtyFilters);
     var casualtiesToShow = d3.selectAll("circle.name")
     for(var i=0; i<filters.length; i++) {
+      if (typeof(filters[i]) !== "function") {
+        continue;
+      }
       casualtiesToShow = casualtiesToShow.filter( function(d) { return filters[i](d); } );
     }
     d3.selectAll("circle").style("visibility", "hidden");
     casualtiesToShow.style("visibility", "visible");
-    $("#year").text("Showing casualties on or before " + $("#slider").slider("value") + " (" + casualtiesToShow.size() + " total)");
+    $("#year").text("Showing casualties on or before " + casualtyFilters.filterDate.toDateString() + " (" + casualtiesToShow.size() + " total)");
     return casualtiesToShow;
   }
 
