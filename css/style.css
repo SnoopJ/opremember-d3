@@ -45,27 +45,24 @@ path:hover {
   visibility: visible;
 }
 
-.infobox {
-  position: absolute;
-  background-color: rgba(73, 72, 129, 0.85);
-}
-
-.infobox > p {
-  margin: 10px;
-}
-
 .name:hover {
   fill: blue;
   stroke: black;
 }
 
-.casbox {
-  position: fixed;
-  max-width: 40%;
-  background-color: #E5E4F1;
+.infobox {
+  /*background-color: #E5E4F1;*/
+  background-color: #c5c5c5;
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 10px;
   border: 1px solid #C2C1CE;
+  /*display: none;
+  opacity: 0.0;*/
+}
+
+.casbox {
+  position: fixed;
+  width: 250px;
 }
 
 .countygeom,
