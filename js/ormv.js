@@ -242,14 +242,6 @@ $( function() {
     filterCasualties();
   }
   d3.select("#showcasualties").on("change",function() { showCasualties() });
-  d3.select("#choropleth").on("change",function() {
-    if (d3.select("#choropleth").node().checked) {
-      doChoropleth();
-    } else {
-      d3.selectAll(".countygeom,.DCgeom").style("fill", null);
-      d3.select(".legendQuant").style("visibility","hidden");
-    }
-  });
 
   d3.selectAll("input[name='showtype']").on("change", function() {
     d3.select("#showcasualties").node().checked = true;
@@ -383,38 +375,6 @@ $( function() {
     casualtyFilters.allCasualties = d3.selectAll("circle.name");
     filterCasualties();
   }
-
-  var colorscale;
-  function doChoropleth() {
-    colorscale = d3.scale.threshold()
-      .domain([0,5,10,20,50,100,1046])
-      .range(['#feedde','#fdd0a2','#fdae6b','#fd8d3c','#f16913','#d94801','#8c2d04'])
-    d3.selectAll(".countynames>g")
-      .each( function(d) {
-        d3.select(".countygeom[countyid='"+zeroFill(d.countyid,3) +"']")
-          .style("fill",function() {
-            return colorscale(d.casualties.length);
-          });
-      });
-    var DCcas = casualtyjson.filter( function(d) { return d.casualties[0].hometown == "WASHINGTON DC" })[0].casualties.length;
-    d3.select(".DCgeom")
-    .style("fill",function() {
-      return colorscale(DCcas);
-    });
-    var legend = d3.legend.color()
-      .labelFormat(d3.format(".2f"))
-      .useClass(true)
-      .scale(colorscale);
-    svg.select(".legendQuant")
-      .style("visibility","visible")
-      .call(legend);
-    d3.selectAll("rect.swatch").style("fill", function(d) { return d }); // something kinda screwy with the legend library so that this is necessary
-  }
-
-    svg.append("g")
-      .attr("class", "legendQuant")
-      .attr("transform", "translate(20,200)")
-      .style("visibility","hidden");
 
   d3.select(self.frameElement).style("height", height + "px");
 });
