@@ -3,6 +3,7 @@
     // bytime: function() { return true; },
     bytime: function(d) { return d.casdate <= casualtyFilters.filterDate; },
     filterDate: (new Date(1962,1,1)),
+    allCasualties: [],
     bycounty: function() { return true; },
     bystate: function() { return true; },
     byphoto: function() { return true; },
@@ -53,22 +54,29 @@ $( function() {
 
   animateCasualties = function() {
     d3.timer( function(t) {
-      var dt = 50;
-      var numsteps = 40*12;
+      var dt,numsteps;
+      dt = 50;
+      numsteps = 27*12;
       if (t > dt*numsteps) {
+        filterCasualties(numsteps); // Last call ensures deterministic end state
         return true;
       }
       $("#slider").slider("value",Math.floor(t/dt));
-      filterCasualties();
+      filterCasualties(Math.floor(t/dt));
     });
   };
 
-  filterCasualties = function() {
-    var sliderVal = $("#slider").slider("value");
+  filterCasualties = function(monthoffset) {
+    var sliderVal, filters, casualtiesToShow;
+    if (typeof(monthoffset) !== "undefined") {
+      sliderVal = monthoffset;
+    } else {
+      sliderVal = $("#slider").slider("value");
+    }
     // TODO: change 1962 from hardcoded to query against slider.min property
     casualtyFilters.filterDate = (new Date(1962 + Math.floor(sliderVal/12),sliderVal%12 + 1,1));
-    var filters = d3.values(casualtyFilters);
-    var casualtiesToShow = d3.selectAll("circle.name")
+    filters = d3.values(casualtyFilters);
+    casualtiesToShow = casualtyFilters.allCasualties;
     for(var i=0; i<filters.length; i++) {
       if (typeof(filters[i]) !== "function") {
         continue;
@@ -76,8 +84,24 @@ $( function() {
       casualtiesToShow = casualtiesToShow.filter( function(d) { return filters[i](d); } );
     }
     // TODO: fade
-    d3.selectAll("circle").style("visibility", "hidden");
-    casualtiesToShow.style("visibility", "visible");
+    d3.selectAll("circle")
+      .style("visibility", function(d) {
+        if (elementInArray(this,casualtiesToShow[0])) {
+          return "visible";
+        } else {
+          return "hidden";
+        }
+      })
+      // .transition()
+      // .duration(150)
+      .style("opacity", function(d) {
+        if (elementInArray(this,casualtiesToShow[0])) {
+          return 1.0;
+        } else {
+          return 0.0;
+        }
+      });
+    // casualtiesToShow.style("visibility", "visible");
     $("#year").text("Showing casualties on or before " + casualtyFilters.filterDate.toDateString() + " (" + casualtiesToShow.size() + " total)");
     return casualtiesToShow;
   }
@@ -90,6 +114,15 @@ $( function() {
 
   function isZoomed(el) {
     return d3.select(el).attr("zoom") > 1;
+  }
+
+  function elementInArray(el,arr) {
+    for(var i=0; i < arr.length; i++) {
+      if(arr[i] === el) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function zoomCounty(d) {
@@ -347,6 +380,7 @@ $( function() {
       .attr("type","button")
       .attr("value","Animate")
       .on("click", animateCasualties);
+    casualtyFilters.allCasualties = d3.selectAll("circle.name");
     filterCasualties();
   }
 
