@@ -228,8 +228,7 @@ $( function() {
     }
   });
   function showCasualties() {
-    var showtype = d3.select("#showcasualties").node().checked &&
-      d3.selectAll("input[name='showtype']").filter(function(d){
+    var showtype = d3.selectAll("input[name='showtype']").filter(function(d){
         return this.checked
       }).node().value;
     casualtyFilters.byphoto = function(d) {
@@ -243,10 +242,8 @@ $( function() {
     };
     filterCasualties();
   }
-  d3.select("#showcasualties").on("change",function() { showCasualties() });
 
   d3.selectAll("input[name='showtype']").on("change", function() {
-    d3.select("#showcasualties").node().checked = true;
     showCasualties();
   });
 
@@ -309,7 +306,7 @@ $( function() {
           return false;
         }
       })
-      .classed("badloc", function() { return d.badloc })
+      // .classed("badloc", function() { return d.badloc })
       .attr("recid", d.recid)
       .attr("zoom", 1)
       .attr("r", 3)
@@ -368,7 +365,6 @@ $( function() {
           .append(createCircle)
         })
       });
-    d3.selectAll(".badloc").style("fill","red"); // color bad locations red, for now
     d3.select(".controls")
       .append("input")
       .attr("type","button")

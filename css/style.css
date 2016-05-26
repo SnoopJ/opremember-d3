@@ -1,29 +1,3 @@
-.showme {
-    border: 1px solid black;
-}
-
-.dontshowme {
-    display: none;
-}
-
-.svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    padding-bottom: 60%; /* aspect ratio */
-    vertical-align: top;
-    overflow: hidden;
-    /*max-width: 775px;*/
-    min-width: 400px;
-}
-.svg-content-responsive {
-    display: inline-block;
-    position: absolute;
-    max-height: 650px;
-    top: 10px;
-    left: 0;
-}
-
 path {
   stroke: #000;
   stroke-width: 0.15rem;
@@ -33,40 +7,90 @@ path:hover {
   stroke: #FF5722;
 }
 
+.showme {
+    /*border: 1px solid black;*/
+}
+
+.dontshowme {
+    display: none;
+}
+
+.svg-container {
+    /* position: relative; */
+    /* padding-bottom: 300px; */
+    vertical-align: top;
+    overflow: hidden;
+    max-height: 768px;
+    min-width: 400px;
+}
+
+.svg-content-responsive {
+    display: inline-block;
+    max-width: 1024px;
+    max-height: 768px;
+    top: 10px;
+    left: 0;
+}
+
 .name {
-  fill: #00ea2e;
+  fill: #1ae442;
   stroke: black;
   visibility: hidden;
 }
 
 .missingphoto {
-  fill: #00c0ff;
+  fill: #e41b00;
   stroke: black;
-  visibility: visible;
 }
 
 .name:hover {
-  fill: blue;
-  stroke: black;
+  fill: #0e6f21;
+}
+
+.name.missingphoto:hover{
+  fill: #791406;
 }
 
 .infobox {
-  /*background-color: #E5E4F1;*/
   background-color: #c5c5c5;
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 10px;
   border: 1px solid #C2C1CE;
-  /*display: none;
-  opacity: 0.0;*/
+  display: none;
+  opacity: 0.0;
 }
+
 
 .casbox {
   position: fixed;
-  width: 250px;
+  width: 300px;
+  padding-bottom: 20px;
 }
 
 .countygeom,
 .DCgeom {
-  /*fill: hsl(81,50%,45%);*/
   fill: #eaab00;
+}
+
+.controls {
+  text-align: center;
+  margin: auto;
+}
+
+.controls > * {
+    margin-bottom: 10px;
+}
+
+#caspic {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#curr {
+  text-align: center;
+}
+
+#slider {
+    max-width: 500px;
+    margin: auto;
 }
