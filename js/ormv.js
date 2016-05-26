@@ -9,12 +9,14 @@
     byphoto: function() { return true; },
   };
 $( function() {
+
   var remaining = 3; // Global var to trigger post-load processing
   var casboxTimeout;
   var width = 712,
       height = 400;
 
-  var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node."
+  var defaultImage = "searching.jpg";
+  var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node.";
   d3.select("#curr").text(defaulttext)
 
   // Thanks to StackOverflow user Peter Bailey for this nice little diddy
@@ -152,9 +154,9 @@ $( function() {
         .attr("zoom", function() { return isZoomed(this) ? 1 : zoomfactor })
         .transition()
         .duration(500)
-        .attr("r", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
-          return d3.select(this).attr("r") * (isZoomed(this) ? 1/zoomfactor : zoomfactor);
-        });
+        // .attr("r", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
+        //   return d3.select(this).attr("r") * (isZoomed(this) ? 1/zoomfactor : zoomfactor);
+        // });
     })
     .transition()
     .duration(500)
@@ -255,7 +257,17 @@ $( function() {
       if(!--remaining) {
           doCasualties(casualtyjson);
       }
-  })
+  });
+
+  function setCasualtyImg(cas) {
+    var url = ( cas.hasphoto && cas.photo ? cas.photo : defaultImage );
+    setImg(url);
+  }
+  function setImg(url) {
+    url = String(url);
+    d3.select("#caspic > img")
+      .attr("src", "img/" + url);
+  }
 
   function hoverCircle(d){
     var e,casbox, casdate;
@@ -267,7 +279,7 @@ $( function() {
     e = d3.event;
     clearTimeout(casboxTimeout);
     casbox = d3.select(".casbox")
-      .style({ display: null })
+      .style({ display: "inline" })
       .transition()
       .duration(500)
       .style({
@@ -278,22 +290,12 @@ $( function() {
 
     casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
     casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
-    d3.select("#caspic > img").attr("src", "img/" + ( d.hasphoto && d.photo ? d.photo : "1111.png"));
+    setCasualtyImg(d);
     casbox.select("#casdate").text(casdate);
     casbox.select("#hometown").text(function(){ return d.hometown });
   }
 
   function clickCircle(d) {
-    d3.selectAll("#casualtyinfo > .row > div.text-left").text("")
-    d3.select("#casname").text(d.fname + " " + d.lname);
-    if (d.hasphoto && d.photo) {
-      d3.select("#caspic").select("img").attr("src","img/"+d.photo);
-    } else {
-      d3.select("#caspic").select("img").attr("src","img/1111.png");
-    }
-    d3.select("#COUNTY").text(d.county);
-    var casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
-    d3.select("#CASDATE").text(casdate);
   }
 
   function createCircle(d) {
