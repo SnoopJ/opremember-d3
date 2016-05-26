@@ -1,1 +1,1 @@
-{"recid": 456, "fname": "JAMES W", "lname": "PRATHER", "hasphoto": true, "photo": null, "hometown": " GAITHERSBURG", "latitude": 39.14344, "longitude": -77.20137, "county": "MONTGOMERY", "countyid": 31, "badloc": false, "casdate": -69811200000.0}
+{"recid": 456, "fname": "JAMES W", "lname": "PRATHER", "hasphoto": true, "photo": "456.png", "hometown": "GAITHERSBURG", "latitude": 39.14344, "longitude": -77.20137, "county": "MONTGOMERY", "countyid": 31, "stateid": "24", "badloc": false, "casdate": -69811200000.0}

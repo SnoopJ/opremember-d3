@@ -1,1 +1,1 @@
-{"recid": 602, "fname": "DONALD RAY", "lname": "KINTON", "hasphoto": true, "photo": null, "hometown": "DENVER CO", "latitude": 39, "longitude": -78, "county": "OTHER", "countyid": 999, "badloc": true, "casdate": -55900800000.0}
+{"recid": 602, "fname": "DONALD RAY", "lname": "KINTON", "hasphoto": true, "photo": "602.jpg", "hometown": "DENVER CO", "latitude": 39.2904, "longitude": -78.6122, "county": "OTHER", "countyid": 999, "stateid": "UNKNOWN", "badloc": true, "casdate": -55900800000.0}

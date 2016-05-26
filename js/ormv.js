@@ -1,12 +1,22 @@
-$( function() {
-  var remaining = 3; // Global var to trigger post-load processing
   var casualtyjson = {}; // Global var to contain JSON...async grossness
-  var fakeImages = false; // Global var, fake images or real ones?
+  var casualtyFilters = {
+    // bytime: function() { return true; },
+    bytime: function(d) { return d.casdate <= casualtyFilters.filterDate; },
+    filterDate: (new Date(1962,1,1)),
+    allCasualties: [],
+    bycounty: function() { return true; },
+    bystate: function() { return true; },
+    byphoto: function() { return true; },
+  };
+$( function() {
 
+  var remaining = 3; // Global var to trigger post-load processing
+  var casboxTimeout;
   var width = 712,
       height = 400;
 
-  var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node."
+  var defaultImage = "searching.jpg";
+  var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node.";
   d3.select("#curr").text(defaulttext)
 
   // Thanks to StackOverflow user Peter Bailey for this nice little diddy
@@ -22,7 +32,6 @@ $( function() {
 
   var projection = d3.geo.mercator()
     .center([-77,37+50/60])
-      // TODO: scale with svg...somehow.
     .scale(7000)
     .translate([width/2,height*0.9])
 
@@ -30,140 +39,279 @@ $( function() {
       .projection(projection);
 
   var svg = d3.select("#mdmap")
-    // .attr("width", width)
-    // .attr("height", height)
     .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("viewBox", "0 0 600 400")
+    .attr("viewBox", "0 0 600 400");
+
+  svg.append("g").attr("id","geo");
 
   $("#slider").slider({
-      value:1975,
-      min: 1955,
-      max: 1975,
+      value: 12*(1968-1962),
+      min: 0,
+      max: 12*(1989-1962),
       step: 1,
       slide: function( event, ui ) {
-        var numvisible = 0;
-        d3.selectAll("circle")
-          .transition()
-          .duration(200)
-          .style("opacity", function(d,i) {
-            var show = (new Date(d.casdate)).getUTCFullYear() <= ui.value;
-            if(show) {
-              numvisible++;
-              d3.select(this).style("visibility","visible");
-              return 1;
-            } else {
-              return 0;
-            }
-          })
-          .each("end", function() {
-            d3.select(this).style("visibility", function(d,i) { return (new Date(d.casdate)).getUTCFullYear() <= ui.value ? "visible" : "hidden"; })
-          })
-        // var numvisible = d3.selectAll("circle").filter( function() { return d3.select(this).style("visibility") == "visible" } ).size(); // probably not ideally performant
-        $("#year").text("Showing casualties on or before " + ui.value + " ("+numvisible+" total)");
+        var numvisible = filterCasualties().size();
       }
     });
-    $("#year").text("Showing casualties on or before " + $("#slider").slider("value"));
+
+  animateCasualties = function() {
+    d3.timer( function(t) {
+      var dt,numsteps;
+      dt = 50;
+      numsteps = 27*12;
+      if (t > dt*numsteps) {
+        filterCasualties(numsteps); // Last call ensures deterministic end state
+        return true;
+      }
+      $("#slider").slider("value",Math.floor(t/dt));
+      filterCasualties(Math.floor(t/dt));
+    });
+  };
+
+  filterCasualties = function(monthoffset) {
+    var sliderVal, filters, casualtiesToShow;
+    if (typeof(monthoffset) !== "undefined") {
+      sliderVal = monthoffset;
+    } else {
+      sliderVal = $("#slider").slider("value");
+    }
+    // TODO: change 1962 from hardcoded to query against slider.min property
+    casualtyFilters.filterDate = (new Date(1962 + Math.floor(sliderVal/12),sliderVal%12 + 1,1));
+    filters = d3.values(casualtyFilters);
+    casualtiesToShow = casualtyFilters.allCasualties;
+    for(var i=0; i<filters.length; i++) {
+      if (typeof(filters[i]) !== "function") {
+        continue;
+      }
+      casualtiesToShow = casualtiesToShow.filter( function(d) { return filters[i](d); } );
+    }
+    // TODO: fade
+    d3.selectAll("circle")
+      .style("visibility", function(d) {
+        if (elementInArray(this,casualtiesToShow[0])) {
+          return "visible";
+        } else {
+          return "hidden";
+        }
+      })
+      // .transition()
+      // .duration(150)
+      .style("opacity", function(d) {
+        if (elementInArray(this,casualtiesToShow[0])) {
+          return 1.0;
+        } else {
+          return 0.0;
+        }
+      });
+    // casualtiesToShow.style("visibility", "visible");
+    $("#year").text("Showing casualties on or before " + casualtyFilters.filterDate.toDateString() + " (" + casualtiesToShow.size() + " total)");
+    return casualtiesToShow;
+  }
+
+  function toBottomOfParent(el) {
+    // SVG z-layering is just draw order, so move to bottom of parentNode
+    // TODO: check if this isn't an SVG element, by crawling upwards in the DOM
+    el.parentNode.appendChild(el);
+  }
+
+  function isZoomed(el) {
+    return d3.select(el).attr("zoom") > 1;
+  }
+
+  function elementInArray(el,arr) {
+    for(var i=0; i < arr.length; i++) {
+      if(arr[i] === el) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function zoomCounty(d) {
+    toBottomOfParent(this.parentNode);
+    t = d3.select(this);
+    countyid = d.properties.COUNTYFP;
+    stateid = d.properties.STATEFP;
+    zoomfactor = 4
+    // select this element and its name container sibling
+    if (isZoomed(this)) {
+      casualtyFilters.bycounty = function(d) { return true };
+      casualtyFilters.bystate = function(d) { return true; };
+    } else {
+      casualtyFilters.bycounty = function(d) { return zeroFill(d.countyid,3) === zeroFill(countyid,3); };
+      casualtyFilters.bystate = function(d) { return d.stateid === stateid; };
+    }
+    filterCasualties();
+    var names = d3.select(".namescontainer > g[stateid='" + stateid + "'] > .countynames[countyid='" + countyid + "']");
+    t.push( names[0] );
+    c = path.centroid(d);
+    c.x = c[0];
+    c.y = c[1];
+    t.each(function() { toBottomOfParent(this); });
+    t.attr("zoom", (isZoomed(this) ? 1 : zoomfactor))
+    .each( function(d) {
+      d3.select(this).selectAll("circle")
+        .attr("zoom", function() { return isZoomed(this) ? 1 : zoomfactor })
+        .transition()
+        .duration(500)
+        // .attr("r", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
+        //   return d3.select(this).attr("r") * (isZoomed(this) ? 1/zoomfactor : zoomfactor);
+        // });
+    })
+    .transition()
+    .duration(500)
+    // This would be simpler than translating twice, but I can't get it to work...
+    // .attr("transform-origin", [c.x,c.y].join(' '))
+    // transform applied right-to-left. So, translate to origin, scale, translate back.
+    // pretty sure the operators are aliases for the matrix transform, which explains this
+    // TODO: circles get larger with this scaling, but this is not terribly desireable (transition r to r/zoomfactor to compensate?)
+    .attr("transform", "translate(" + (c.x) + "," + (c.y) +") " +
+      "scale(" + t.attr("zoom") +") " +
+      "translate(" + [-c.x,-c.y].join(',') + ") "
+    )
+    //
+    // z-index cleanup - after a zoom finishes, all circles should be on top
+    // might also be helpful to use Node.insertBefore() ?
+    // TODO: this can be interrupted, but there should only ever be one zoomed county anyway!
+    .each("end", function() { if (!isZoomed(this)) {
+      d3.selectAll(".names").each( function() { toBottomOfParent(this);} );
+    }})
+  }
+
   d3.json("json/MD.json", function(error, mapdata) {
-    svg.append("g").attr("id","MDgeo")
+    svg.select("#geo")
+      .append("g").attr("id","MD")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
       .enter()
       .append("g")
       .classed("countygeom",true)
       .attr("countyid", function(d) { return d.properties.COUNTYFP; })
+      .attr("stateid", function(d) { return d.properties.STATEFP; })
+      .attr("zoom", 1)
+      .on('click', zoomCounty)
       .append("path")
       .attr("d", path)
+      .attr("zoom", 1)
       .on('mouseover', function(d,i) {
+        toBottomOfParent(this.parentNode);
         var countyid = this.parentNode.getAttribute("countyid");
         d3.select("#curr").text(
           d.properties.NAME + ", casualties: " +
-          casualtyjson.filter(function(d) { return d.countyid == countyid })[0].casualties.length
+          d3.selectAll(".countynames[countyid='" + countyid + "'] > circle").size()
         )
       })
       .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
-    // console.log("Geometry loaded, "+(remaining-1)+" remaining things to do...");
     if(!--remaining) {
       doCasualties(casualtyjson);
     }
   });
 
   d3.json("json/DC.json", function(error, mapdata) {
-    svg.append("g").attr("id","DCgeo")
+    svg.select("#geo")
+      .append("g")
+      .attr("id","DC")
       .selectAll("path")
       .data(topojson.feature(mapdata, mapdata.objects.out).features)
       .enter()
       .append("g")
+      .attr("countyid", function(d) { return d.properties.COUNTYFP; })
+      .attr("stateid", function(d) { return d.properties.STATEFP; })
+      .attr("zoom", 1)
+      .on('click', zoomCounty)
       .classed("DCgeom",true)
       .append("path")
       .attr("d", path)
+      .attr("zoom", 1)
     if(!--remaining) {
       doCasualties(casualtyjson);
     }
   });
   function showCasualties() {
-    var showtype = d3.select("#showcasualties").node().checked && d3.selectAll("input[name='showtype']").filter(function(d){ return this.checked }).node().value;
-    d3.selectAll("circle").style("visibility","hidden");
-    d3.selectAll("circle").filter(function(d,i) {
-      return (showtype === "all") || (showtype === "withphoto" && d.hasphoto) || (showtype === "withoutphoto" && !d.hasphoto) ;
-    }).style("visibility","visible")
+    var showtype = d3.selectAll("input[name='showtype']").filter(function(d){
+        return this.checked
+      }).node().value;
+    casualtyFilters.byphoto = function(d) {
+      if(showtype === false) {
+        return false;
+      } else if(showtype === "all") {
+        return true;
+      } else {
+        return showtype === "withphoto" ? d.hasphoto : !d.hasphoto;
+      }
+    };
+    filterCasualties();
   }
-  d3.select("#showcasualties").on("change",function() { showCasualties() });
-  d3.select("#choropleth").on("change",function() {
-    if (d3.select("#choropleth").node().checked) {
-      doChoropleth();
-    } else {
-      d3.selectAll(".countygeom,.DCgeom").style("fill", null);
-      d3.select(".legendQuant").style("visibility","hidden");
-    }
-  });
 
   d3.selectAll("input[name='showtype']").on("change", function() {
-    d3.select("#showcasualties").node().checked = true;
     showCasualties();
   });
 
 
-  d3.json("json/bycounty.json", function(e,json) {
+  d3.json("json/flatdb.json", function(e,json) {
       casualtyjson = json;
-      // console.log("Casualties loaded, "+(remaining-1)+" remaining things to do...");
       if (e) console.log(e)
       if(!--remaining) {
-          // console.log("call doCasualties()");
           doCasualties(casualtyjson);
       }
-  })
+  });
+
+  function setCasualtyImg(cas) {
+    var url = ( cas.hasphoto && cas.photo ? cas.photo : defaultImage );
+    setImg(url);
+  }
+  function setImg(url) {
+    url = String(url);
+    d3.select("#caspic > img")
+      .attr("src", "img/" + url);
+  }
 
   function hoverCircle(d){
+    var e,casbox, casdate;
     d3.select("#curr")
       .text(d.lname + ", " + d.fname +
         "  ; HOMETOWN: " + d.hometown +
-        " (county: " + d.county + " )" )
+        " (county: " + d.county + " )"
+      );
+    e = d3.event;
+    clearTimeout(casboxTimeout);
+    casbox = d3.select(".casbox")
+      .style({ display: "inline" })
+      .transition()
+      .duration(500)
+      .style({
+        left: e.clientX + 30 + "px",
+        top: e.clientY + "px",
+        opacity: 1.0
+      });
+
+    casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
+    casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
+    setCasualtyImg(d);
+    casbox.select("#casdate").text(casdate);
+    casbox.select("#hometown").text(function(){ return d.hometown });
   }
 
   function clickCircle(d) {
-    d3.selectAll("#casualtyinfo>.row>div.text-left").text("")
-    d3.select("#cas-name").text(d.fname + " " + d.lname);
-    if (d.hasphoto && d.photo) {
-      d3.select("#cas-pic").select("img").attr("src","img/"+d.photo);
-    } else {
-      d3.select("#cas-pic").select("img").attr("src","img/1111.png");
-    }
-    d3.select("#COUNTY").text(d.county);
-    var casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
-    d3.select("#CASDATE").text(casdate);
-    // animate a slide-in
   }
 
   function createCircle(d) {
     // Using createElementNS is necessary, <circle> is not meaningful in the HTML namespace
-    elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg","circle"))
-      .classed("name",true)
-      .classed("badloc",function() { return d.badloc })
+    elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "circle"))
+      .classed("name", true)
+      .classed("missingphoto", function() {
+        if(typeof(d.hasphoto) === "boolean") {
+          return !d.hasphoto;
+        } else {
+          return false;
+        }
+      })
+      // .classed("badloc", function() { return d.badloc })
       .attr("recid", d.recid)
-      .attr("r",3)
+      .attr("zoom", 1)
+      .attr("r", 3)
       .attr("transform", function() {
         var lat,lon;
-        // "latitude": 38.40481, "longitude": -75.56508
         if ( d.badloc && d.longitude == -78 ) {
           d.longitude = -78.69971 + Math.random(); // randomly spread out the badlocs that are other states/etc.
           d.latitude = 39 - Math.random();
@@ -175,67 +323,56 @@ $( function() {
         return "translate("+ proj[0] +"," + proj[1] + ")"
       })
       .on("mouseover",hoverCircle)
-      .on("mouseout", function(d,i) { d3.select("#curr").text(defaulttext) })
-      .on("click", clickCircle)
-    // console.log("Creating circle for record "+d.recid+" with lat/lon ("+d.latitude+","+d.longitude+")")
-    return elem.node()
+      .on("mouseout", function(d,i) {
+        d3.select("#curr").text(defaulttext);
+        casboxTimeout = setTimeout( function() {
+          d3.select(".casbox")
+            .transition()
+            .duration(500)
+            .style({ opacity: 0.0 })
+            .transition()
+            .style({ display: "none" });
+        }, 1000);
+      })
+      .on("click", clickCircle);
+    return elem.node();
   }
   function doCasualties(casualtyjson) {
-    svg.append("g").classed("countynames",true)
+    reshape = d3.nest()
+      .key(function(d){ return d.stateid })
+      .key(function(d) { return d.countyid })
+      .entries(casualtyjson);
+    svg.append("g").classed("namescontainer",true)
       .selectAll("g")
-      .data(casualtyjson)
+      .data(reshape)
       .enter()
       .append("g")
-      .attr("countyid",function(d,i) { return zeroFill(d.countyid,3) } )
+      .attr("stateid", function(d,i) { return d.key; })
       .each( function(d,i) {
-        var countyid = d.countyid;
-        var countycas = d.casualties;
+        var stateid = d.key;
         d3.select(this)
-        .selectAll(".names")
-        .data(countycas)
+        .selectAll(".countynames")
+        .data(d3.values(d.values))
         .enter()
-        .append(createCircle)
-      })
-      .data(casualtyjson)
-      .enter( function(d,i) {
-        var cty = zeroFill(d.countyid,3);
-        return cty;
-      })
-    d3.selectAll(".name").filter( function(d) { return d.hasphoto && d.photo }).style("fill","#00ea2e");
-    d3.selectAll(".badloc").style("fill","red") // color bad locations red, for now
-  }
-
-  var colorscale;
-  function doChoropleth() {
-    colorscale = d3.scale.threshold()
-      .domain([0,5,10,20,50,100,1046])
-      .range(['#feedde','#fdd0a2','#fdae6b','#fd8d3c','#f16913','#d94801','#8c2d04'])
-    d3.selectAll(".countynames>g")
-      .each( function(d) {
-        d3.select(".countygeom[countyid='"+zeroFill(d.countyid,3) +"']")
-          .style("fill",function() {
-            return colorscale(d.casualties.length);
-          });
+        .append("g")
+        .classed("countynames", true)
+        .attr("countyid", function(d) { return zeroFill(d.key,3) })
+        .each( function(d,i) {
+          d3.select(this)
+          .selectAll(".names")
+          .data(d.values)
+          .enter()
+          .append(createCircle)
+        })
       });
-    var DCcas = casualtyjson.filter( function(d) { return d.casualties[0].hometown == "WASHINGTON DC" })[0].casualties.length;
-    d3.select(".DCgeom")
-    .style("fill",function() {
-      return colorscale(DCcas);
-    });
-    var legend = d3.legend.color()
-      .labelFormat(d3.format(".2f"))
-      .useClass(true)
-      .scale(colorscale);
-    svg.select(".legendQuant")
-      .style("visibility","visible")
-      .call(legend);
-    d3.selectAll("rect.swatch").style("fill", function(d) { return d }); // something kinda screwy with the legend library so that this is necessary
+    d3.select(".controls")
+      .append("input")
+      .attr("type","button")
+      .attr("value","Animate")
+      .on("click", animateCasualties);
+    casualtyFilters.allCasualties = d3.selectAll("circle.name");
+    filterCasualties();
   }
-
-    svg.append("g")
-      .attr("class", "legendQuant")
-      .attr("transform", "translate(20,200)")
-      .style("visibility","hidden");
 
   d3.select(self.frameElement).style("height", height + "px");
 });

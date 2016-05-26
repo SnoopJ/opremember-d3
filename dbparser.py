@@ -9,6 +9,7 @@ import sys
 import xml.etree.ElementTree as ET
 import json
 # import binascii
+from datetime import datetime
 from base64 import b64decode
 from collections import OrderedDict
 import re
@@ -19,7 +20,7 @@ import code
 counties = {
     1: "Allegany",
     3: "Anne Arundel",
-    5: "Baltimore County",
+    5: "Baltimore( County)?$",
     9: "Calvert",
     11: "Caroline",
     13: "Carroll",
@@ -41,9 +42,15 @@ counties = {
     43: "Washington",
     45: "Wicomico",
     47: "Worcester",
-    510: "Baltimore( CITY)?$",
+    510: "Baltimore City",
     # cheating here just so I can see what else breaks.
     999: "OTHER"
+}
+
+states = {
+    "MD": "24",
+    "DC": "11",
+    "UNKNOWN": "UNKNOWN"
 }
 
 # dict of compiled regexes
@@ -63,6 +70,8 @@ indb = tree.getroot()
 outdb = []
 
 imgdir = 'img'
+jsondir = 'json/'
+[os.makedirs(exportdir) for exportdir in [imgdir, jsondir] if not os.path.exists(exportdir)]
 
 placesfile = file('MDppls.txt', 'r')
 places = placesfile.readlines()
@@ -73,38 +82,55 @@ def warning(*objs):
     print("WARNING: ", *objs, file=sys.stderr)
 
 
+def getRec(indb, recid):
+    r = indb.find("./ormvmasterfile/[REC='" + str(recid) + "']")
+    return r
+
+
 def getPhoto(rec):
-    rec.hasphoto = bool(rec.find("PHOTO").text)
-    if not rec.hasphoto:
-        print("INFO: no photo for record " + str(rec.recid))
-        rec.photo = "1111.png"
-        return None
+    try:
+        rec.hasphoto = bool(int(getTag(rec, "PHOTO")))
+    except:
+        print("An error occurred while processing the 'PHOTO' tag")
+        print(sys.exc_info()[0])
+        raise
+
+    # if not rec.hasphoto:
+    #     print("INFO: no photo for record " + str(rec.recid))
+    #     rec.photo = "1111.png"
+    #     return None
 
     photo = rec.find("photo_x0020_attachments")
+    # image data for clippings is in the print_... field, but NOT photos (e.g. obits)
+    # clipping = rec.find("print_x0020_attachments")
+
+    # if the bool field and the attachments are in disagreement, print a warning
+    if rec.hasphoto and photo is None:
+        print("INFO: Record " + str(rec.recid) + " has a photo listed, but no photo is present in the database.")
+    elif not rec.hasphoto and photo is not None:
+        print("INFO: Record " + str(rec.recid) + " has no photo listed, but a photo is present in the database.")
+
+    if photo is None:
+        return None
 
     if DOPHOTOS:
-        if photo is None:
-            print("INFO: Record " + str(rec.recid) + " has a photo listed, but no photo is present in the database.")
+        try:
+            p = b64decode(photo.find("FileData").text.replace("\n", "").replace("\r", ""))
+            # TODO(?): sanity check here, not all extensions are 3 letters.
+            ext = '.' + p[12:18:2]
+            print("DEBUG: header is " + str(ext))
+            p = p[20:]
+            # MS reserves 20 bytes for...who the hell knows.
+            fn = str(rec.recid) + ext
+            f = file(imgdir + "/" + fn, 'wb')
+            print(p, file=f)
+            f.close()
+            return fn
+        except BaseException as e:
+            warning("Could not decode photo for record %s:" + str(rec.recid))
+            print(str(e))
+            raise
             return None
-        else:
-            if not os.path.exists(imgdir):
-                os.makedirs(imgdir)
-
-            try:
-                p = b64decode(photo.find("FileData").text.replace("\n", "").replace("\r", ""))
-                # TODO(?): sanity check here, not all extensions are 3 letters.
-                ext = '.' + p[12:18:2]
-                print("DEBUG: header is " + str(ext))
-                p = p[20:]
-                # MS reserves 20 bytes for...who the hell knows.
-                fn = str(rec.recid) + ext
-                f = file(imgdir + "/" + fn, 'wb')
-                print(p, file=f)
-                f.close()
-                return fn
-            except:
-                warning("Could not decode photo for record " + str(rec.recid))
-                return None
     else:
         return "1111.png"
 
@@ -115,41 +141,12 @@ def getTag(rec, tag):
         print("INFO: Tag " + tag + " for record " + str(rec.recid) + "requested, but none found")
         return None
     else:
-        return t.text
+        return t.text.strip()
 
 
 def initRec(rec):
     rec.recid = int(rec.find("REC").text)
     rec.badloc = False
-
-
-def getLocation(rec):
-    r = re.compile("^[^\t]+\t" + re.escape(rec.hometown.lstrip()), re.IGNORECASE)
-    res = []
-    for p in places:
-        if r.search(p) is not None:
-            res.append(p)
-    return res
-
-
-def parseLocation(loc, rec):
-    if len(loc) > 0:
-        # print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
-        info = (loc[0]).split("\t")
-        lat = float(info[4])
-        lon = float(info[5])
-        # print("(Lat,Long) should be (%f,%f)" % (lat,lon))
-        rec.latitude = lat
-        rec.longitude = lon
-    else:
-        print("Hometown (%s) not recovered (recid %s)" % (rec.hometown, rec.recid))
-        code.interact(local=dict(globals(), **locals()))
-
-
-def fixRecLocation(newlocname, rec):
-    rec.hometown = newlocname
-    newloc = getLocation(rec)
-    parseLocation(newloc, rec)
 
 hometownswaps = {
     'MARLOWE HEIGHTS': 'MARLOW HEIGHTS',
@@ -159,6 +156,41 @@ hometownswaps = {
     'MOUNT RANIER': 'MOUNT RAINIER',
     'WHALEYSVILLE': 'WHALEYVILLE'
 }
+
+def getLocation(rec):
+    hometown = rec.hometown
+    if hometown in hometownswaps.keys():
+        print("Hometown listed as %s, locating using %s instead" % (hometown, hometownswaps[hometown]))
+        hometown = hometownswaps[hometown]
+    r = re.compile("^[^\t]+\t" + re.escape(hometown), re.IGNORECASE)
+    res = []
+    for p in places:
+        if r.search(p) is not None:
+            res.append(p)
+    return res
+
+
+def setLocation(loc, rec):
+    if len(loc) > 0:
+        # print("Hometown (%s) successfully recovered (%s time(s))! (recid %s)"% (rec.hometown,len(loc),rec.recid))
+        info = (loc[0]).split("\t")
+        lat = float(info[4])
+        lon = float(info[5])
+        # print("(Lat,Long) should be (%f,%f)" % (lat,lon))
+        rec.latitude = lat
+        rec.longitude = lon
+        if info[10].strip() != '':
+            rec.stateid = info[10].strip()
+    else:
+        print("Hometown (%s) not recovered (recid %s)" % (rec.hometown, rec.recid))
+        code.interact(local=dict(globals(), **locals()))
+
+
+def fixRecLocation(newlocname, rec):
+    rec.hometown = newlocname
+    newloc = getLocation(rec)
+    setLocation(newloc, rec)
+
 
 
 def doRecs(db, idx=-1):
@@ -180,7 +212,7 @@ def doRecs(db, idx=-1):
 
         rec.casdate = getTag(rec, "CASDATE")
 
-        if rec.casdate is not None and rec.casdate.strip().isdigit():
+        if rec.casdate is not None and rec.casdate.isdigit():
             print("casdate is %s" % rec.casdate)
             t = datetime.strptime(rec.casdate.strip(), "%Y%m%d")
             rec.casdate = (t - datetime(1970, 1, 1)).total_seconds() * 1000  # convert to time since epoch
@@ -205,11 +237,9 @@ def doRecs(db, idx=-1):
         if rec.hometown is None:
             rec.hometown = '?'
             rec.badloc = True
-        if rec.hometown.strip() in hometownswaps.keys():
-            print("Correcting hometown from %s to %s", rec.hometown, hometownswaps[rec.hometown.strip()])
-            rec.hometown = hometownswaps[rec.hometown.strip()]
         rec.longitude = -78.6122
         rec.latitude = 39.2904
+        rec.stateid = "UNKNOWN"
         # TODO: resolve county name with county id, then check against county
         #   that SHOULD resolve duplicate false positives...
         # 10th field in place names file is 3-digit county id
@@ -217,7 +247,7 @@ def doRecs(db, idx=-1):
             # print("Trying to resolve hometown: %s" % rec.hometown )
             loc = getLocation(rec)
             if len(loc) > 0:
-                parseLocation(loc, rec)
+                setLocation(loc, rec)
             else:
                 print("Hometown (%s) not recovered (recid %s)" % (rec.hometown, rec.recid))
                 rec.badloc = True
@@ -243,7 +273,10 @@ def doRecs(db, idx=-1):
                     print("Distance from loc[0] lat/long is %f" % dist)
                     print("Hometown candidate %s is in county %s" % (info[1], info[11]))
 
-        with file('json/' + str(rec.recid) + ".json", 'w') as outfile:
+        with file(jsondir + str(rec.recid) + ".json", 'w') as outfile:
+            if rec.recid == 33:
+                print(rec.state)
+                exit()
             outrec = OrderedDict([
                 ('recid', rec.recid),
                 ('fname', rec.fname),
@@ -255,16 +288,20 @@ def doRecs(db, idx=-1):
                 ('longitude', rec.longitude),
                 ('county', rec.county),
                 ('countyid', rec.countyid),
-                ('badloc', rec.badloc)
+                ('stateid', states[rec.stateid]),
+                ('badloc', rec.badloc),
+                ('casdate', rec.casdate)
             ])
             outdb.append(outrec)
             json.dump(outrec, outfile)
             # print(json.dumps(outrec), file=outfile)
 
-doRecs(indb)
-# TODO: shit don't work yo
-# outfile = file("ormvdb.json.long",'w')
-# print(json.dumps(outdb).replace("},","},\n"),file=outfile)
-# outfile.close()
 
-print("All done!\a\a\a")
+
+def main(argv):
+    doRecs(indb)
+    print("All done!\a\a\a")
+
+
+if __name__ == "__main__":
+    main(sys.argv)

@@ -1,1 +1,1 @@
-{"recid": 358, "fname": "CARROLL THOMAS", "lname": "JACKSON", "hasphoto": false, "photo": "1111.png", "hometown": " PRINCESS ANNE", "latitude": 38.2029, "longitude": -75.69243, "county": "SOMERSET", "countyid": 39, "badloc": false, "casdate": 85449600000.0}
+{"recid": 358, "fname": "CARROLL THOMAS", "lname": "JACKSON", "hasphoto": true, "photo": "358.jpg", "hometown": "PRINCESS ANNE", "latitude": 38.2029, "longitude": -75.69243, "county": "SOMERSET", "countyid": 39, "stateid": "24", "badloc": false, "casdate": 85449600000.0}

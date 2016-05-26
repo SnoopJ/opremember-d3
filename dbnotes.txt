@@ -23,6 +23,6 @@ CIT - no idea, set to 1 for everyone...
 TOURD - tour date (begin?) in YYMMDD format
 REFNO - ???
 PDATE - seems to be related to CASDATE
-NPA - boolean, ???
+NPA - boolean, "news paper article" - not always news, but informational evidence
 photo_x0020_attachments - photo(s)
 provlist - duplicate vitals?
