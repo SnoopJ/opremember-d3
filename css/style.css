@@ -14,9 +14,16 @@ path:hover {
 }
 
 .casbox {
-  position: fixed;
-  width: 300px;
-  padding-bottom: 20px;
+  /*position: fixed;
+  width: 300px;*/
+
+  background-color: #99ad97;
+  /*padding-bottom: 20px;
+  left: 0px;
+  bottom: 0px;*/
+  /*position: absolute;*/
+  /*max-width: 300px;
+  max-height: 50%;*/
 }
 
 .container {
@@ -54,12 +61,12 @@ path:hover {
 
 .maprow {
   margin: 0 auto;
-  max-height: 85%;
-  max-width: 90%;
+  /*max-height: 85%;*/
+  /*max-width: 90%;*/
   overflow: auto;
   padding-top: 1%;
   position: inherit;
-  width: 100%;
+  /*width: 100%;*/
 }
 
 .showme {
@@ -86,11 +93,10 @@ path:hover {
 }
 
 .infobox {
-  background-color: #c5c5c5;
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 10px;
   border: 1px solid #C2C1CE;
-  display: none;
+  /*display: none;*/
   opacity: 0.0;
 }
 
@@ -106,8 +112,8 @@ path:hover {
 
 .svg-content-responsive {
   display: inline-block;
-  max-width: 75%;
-  max-height: 75%;
+  /*max-width: 75%;*/
+  /*max-height: 75%;*/
   position: inherit;
   /*max-width: 1024px;
   max-height: 768px;*/

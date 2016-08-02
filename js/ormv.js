@@ -275,16 +275,16 @@ $( function() {
         " (county: " + d.county + " )"
       );
     e = d3.event;
-    clearTimeout(casboxTimeout);
+    // clearTimeout(casboxTimeout);
     casbox = d3.select(".casbox")
-      .style({ display: "inline" })
-      .transition()
-      .duration(500)
-      .style({
-        left: e.clientX + 30 + "px",
-        top: e.clientY + "px",
-        opacity: 1.0
-      });
+    //   .style({ display: "inline" })
+    //   .transition()
+    //   .duration(500)
+    //   .style({
+    //     left: e.clientX + 30 + "px",
+    //     top: e.clientY + "px",
+    //     opacity: 1.0
+    //   });
 
     casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
     casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
@@ -326,14 +326,14 @@ $( function() {
       .on("mouseover",hoverCircle)
       .on("mouseout", function(d,i) {
         d3.select("#curr").text(defaulttext);
-        casboxTimeout = setTimeout( function() {
-          d3.select(".casbox")
-            .transition()
-            .duration(500)
-            .style({ opacity: 0.0 })
-            .transition()
-            .style({ display: "none" });
-        }, 1000);
+        // casboxTimeout = setTimeout( function() {
+        //   d3.select(".casbox")
+        //     .transition()
+        //     .duration(500)
+        //     .style({ opacity: 0.0 })
+        //     .transition()
+        //     .style({ display: "none" });
+        // }, 1000);
       })
       .on("click", clickCircle);
     return elem.node();
