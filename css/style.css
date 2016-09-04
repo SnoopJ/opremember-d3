@@ -2,9 +2,15 @@ body,html {
   height: 100%;
   position: inherit;
   width: 100%;
+  overflow: hidden;
 }
 
 body > .row {
+  height: 100%;
+}
+
+body .row > div[class^='col-'] {
+/*.casbox {*/
   height: 100%;
 }
 
@@ -32,7 +38,6 @@ path:hover {
 }
 
 .container {
-  height: 100%;
   position: inherit;
   width: 100%;
 }
@@ -105,6 +110,7 @@ path:hover {
   opacity: 0.0;
 }
 
+
 .svg-container {
   /* position: relative; */
   /* padding-bottom: 300px; */
@@ -129,6 +135,13 @@ path:hover {
 #caspic {
   padding-top: 15px;
   padding-bottom: 15px;
+}
+
+#caspic > img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 50%;
 }
 
 #curr {
