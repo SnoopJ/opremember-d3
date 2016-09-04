@@ -46,7 +46,7 @@ $( function() {
   svg.append("g").attr("id","geo");
 
   $("#slider").slider({
-      value: 12*(1968-1962),
+      value: 12*(1989-1962),
       min: 0,
       max: 12*(1989-1962),
       step: 1,
