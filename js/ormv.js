@@ -1,13 +1,16 @@
   var casualtyjson = {}; // Global var to contain JSON...async grossness
   var casualtyFilters = {
     // bytime: function() { return true; },
-    bytime: function(d) { return d.casdate <= casualtyFilters.filterDate; },
+    bytime: function(d) {
+      return d.casdate <= casualtyFilters.filterDate;
+    },
     filterDate: (new Date(1962,1,1)),
     allCasualties: [],
     bycounty: function() { return true; },
     bystate: function() { return true; },
     byphoto: function() { return true; },
   };
+  var filterCasualties;
 $( function() {
 
   var remaining = 3; // Global var to trigger post-load processing
@@ -84,7 +87,12 @@ $( function() {
       if (typeof(filters[i]) !== "function") {
         continue;
       }
-      casualtiesToShow = casualtiesToShow.filter( function(d) { return filters[i](d); } );
+      casualtiesToShow = casualtiesToShow.filter(function(d) {
+        return d.values.filter(function(c) {
+          return filters[i](c);
+        })
+        .length > 0;
+      });
     }
     // TODO: fade
     d3.selectAll("circle")
@@ -105,7 +113,7 @@ $( function() {
         }
       });
     // casualtiesToShow.style("visibility", "visible");
-    $("#year").text("Showing casualties on or before " + casualtyFilters.filterDate.toDateString() + " (" + casualtiesToShow.size() + " total)");
+    $("#year").text("Showing hometowns with casualties on or before " + casualtyFilters.filterDate.toDateString() + " (" + casualtiesToShow.size() + " total)");
     return casualtiesToShow;
   }
 
@@ -298,6 +306,7 @@ $( function() {
   }
 
   function createCircle(d) {
+    var d = d.values[0];
     // Using createElementNS is necessary, <circle> is not meaningful in the HTML namespace
     elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "circle"))
       .classed("name", true)
@@ -343,6 +352,7 @@ $( function() {
     reshape = d3.nest()
       .key(function(d){ return d.stateid })
       .key(function(d) { return d.countyid })
+      .key(function(d) { return d.hometown })
       .entries(casualtyjson);
     svg.append("g").classed("namescontainer",true)
       .selectAll("g")
