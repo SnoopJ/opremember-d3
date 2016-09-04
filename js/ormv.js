@@ -286,6 +286,7 @@ $( function() {
     //     opacity: 1.0
     //   });
 
+    d3.selectAll(".casvitals").style("visibility", "visible");
     casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
     casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
     setCasualtyImg(d);

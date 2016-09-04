@@ -37,6 +37,10 @@ path:hover {
   max-height: 50%;*/
 }
 
+.casvitals {
+  visibility: hidden;
+}
+
 .container {
   position: inherit;
   width: 100%;
