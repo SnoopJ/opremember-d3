@@ -12,8 +12,6 @@ $( function() {
 
   var remaining = 3; // Global var to trigger post-load processing
   var casboxTimeout;
-  var width = 712,
-      height = 400;
 
   var defaultImage = "searching.jpg";
   var defaulttext = "Mouse over a county or personnel node to see its name.  Click a personnel node to see photos associated with that node.";
@@ -30,17 +28,20 @@ $( function() {
     return number + ""; // always return a string
   }
 
+  var width = 712,
+      height = 300;
+
   var projection = d3.geo.mercator()
     .center([-77,37+50/60])
     .scale(7000)
-    .translate([width/2,height*0.9])
+    .translate([width/2,height])
 
   var path = d3.geo.path()
       .projection(projection);
 
   var svg = d3.select("#mdmap")
     .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("viewBox", "0 0 600 400");
+    .attr("viewBox", "0 0 600 300");
 
   svg.append("g").attr("id","geo");
 
@@ -274,16 +275,16 @@ $( function() {
         " (county: " + d.county + " )"
       );
     e = d3.event;
-    clearTimeout(casboxTimeout);
+    // clearTimeout(casboxTimeout);
     casbox = d3.select(".casbox")
-      .style({ display: "inline" })
-      .transition()
-      .duration(500)
-      .style({
-        left: e.clientX + 30 + "px",
-        top: e.clientY + "px",
-        opacity: 1.0
-      });
+    //   .style({ display: "inline" })
+    //   .transition()
+    //   .duration(500)
+    //   .style({
+    //     left: e.clientX + 30 + "px",
+    //     top: e.clientY + "px",
+    //     opacity: 1.0
+    //   });
 
     casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
     casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
@@ -325,14 +326,14 @@ $( function() {
       .on("mouseover",hoverCircle)
       .on("mouseout", function(d,i) {
         d3.select("#curr").text(defaulttext);
-        casboxTimeout = setTimeout( function() {
-          d3.select(".casbox")
-            .transition()
-            .duration(500)
-            .style({ opacity: 0.0 })
-            .transition()
-            .style({ display: "none" });
-        }, 1000);
+        // casboxTimeout = setTimeout( function() {
+        //   d3.select(".casbox")
+        //     .transition()
+        //     .duration(500)
+        //     .style({ opacity: 0.0 })
+        //     .transition()
+        //     .style({ display: "none" });
+        // }, 1000);
       })
       .on("click", clickCircle);
     return elem.node();
@@ -365,11 +366,6 @@ $( function() {
           .append(createCircle)
         })
       });
-    d3.select(".controls")
-      .append("input")
-      .attr("type","button")
-      .attr("value","Animate")
-      .on("click", animateCasualties);
     casualtyFilters.allCasualties = d3.selectAll("circle.name");
     filterCasualties();
   }

@@ -4,6 +4,8 @@ interactive map for Operation Remember using d3.js, viewable at http://snoopjedi
 Operation Remember is an effort to recover a photograph of each of the 1046 Sons of Maryland that died in the Vietnam War.
 https://ormv.wordpress.com/
 
+All source code is available for re-use under the terms of the MIT License (see LICENSE file), and **all rights to casualty photos remain with the family and friends who generously provided them to the project**.
+
 ### Sources used:
 Populated place database from US.txt, via [GeoNames.org](http://www.geonames.org/export/)
 

@@ -1,3 +1,19 @@
+body,html {
+  height: 100%;
+  position: inherit;
+  width: 100%;
+  overflow: hidden;
+}
+
+body > .row {
+  height: 100%;
+}
+
+body .row > div[class^='col-'] {
+/*.casbox {*/
+  height: 100%;
+}
+
 path {
   stroke: #000;
   stroke-width: 0.15rem;
@@ -7,29 +23,64 @@ path:hover {
   stroke: #FF5722;
 }
 
-.showme {
-    /*border: 1px solid black;*/
+.casbox {
+  /*position: fixed;
+  width: 300px;*/
+
+  background-color: #99ad97;
+  height: 100%;
+  /*padding-bottom: 20px;
+  left: 0px;
+  bottom: 0px;*/
+  /*position: absolute;*/
+  /*max-width: 300px;
+  max-height: 50%;*/
+}
+
+.container {
+  position: inherit;
+  width: 100%;
+}
+
+.controlrow {
+  margin: 0 auto;
+  max-height: 15%;
+  max-width: 90%;
+  padding-bottom: 1%;
+}
+
+.controls {
+  height: 100%;
+  margin: auto;
+  position: inherit;
+  text-align: center;
+  width: 100%;
+}
+
+.controls > * {
+  margin-bottom: 10px;
+}
+.countygeom,
+.DCgeom {
+  fill: #eaab00;
 }
 
 .dontshowme {
     display: none;
 }
 
-.svg-container {
-    /* position: relative; */
-    /* padding-bottom: 300px; */
-    vertical-align: top;
-    overflow: hidden;
-    max-height: 768px;
-    min-width: 400px;
+.maprow {
+  margin: 0 auto;
+  /*max-height: 85%;*/
+  /*max-width: 90%;*/
+  overflow: auto;
+  padding-top: 1%;
+  position: inherit;
+  /*width: 100%;*/
 }
 
-.svg-content-responsive {
-    display: inline-block;
-    max-width: 1024px;
-    max-height: 768px;
-    top: 10px;
-    left: 0;
+.showme {
+    /*border: 1px solid black;*/
 }
 
 .name {
@@ -52,33 +103,33 @@ path:hover {
 }
 
 .infobox {
-  background-color: #c5c5c5;
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 10px;
   border: 1px solid #C2C1CE;
-  display: none;
+  /*display: none;*/
   opacity: 0.0;
 }
 
 
-.casbox {
-  position: fixed;
-  width: 300px;
-  padding-bottom: 20px;
+.svg-container {
+  /* position: relative; */
+  /* padding-bottom: 300px; */
+  vertical-align: top;
+  overflow: hidden;
+  position: inherit;
+  /*max-height: 768px;
+  min-width: 400px;*/
 }
 
-.countygeom,
-.DCgeom {
-  fill: #eaab00;
-}
-
-.controls {
-  text-align: center;
-  margin: auto;
-}
-
-.controls > * {
-    margin-bottom: 10px;
+.svg-content-responsive {
+  display: inline-block;
+  /*max-width: 75%;*/
+  /*max-height: 75%;*/
+  position: inherit;
+  /*max-width: 1024px;
+  max-height: 768px;*/
+  top: 10px;
+  left: 0;
 }
 
 #caspic {
@@ -86,11 +137,18 @@ path:hover {
   padding-bottom: 15px;
 }
 
+#caspic > img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 50%;
+}
+
 #curr {
   text-align: center;
 }
 
 #slider {
-    max-width: 500px;
-    margin: auto;
+  max-width: 500px;
+  margin: auto;
 }
