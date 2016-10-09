@@ -11,7 +11,7 @@
     byphoto: function() { return true; },
   };
   var filterCasualties;
-$( function() {
+$(function() {
 
   var remaining = 3; // Global var to trigger post-load processing
   var casboxTimeout;
@@ -23,10 +23,10 @@ $( function() {
   // Thanks to StackOverflow user Peter Bailey for this nice little diddy
   // http://stackoverflow.com/a/1267338
   // Fills a number (e.g. 33) to a fixed width string by padding with leading zeroes ("033")
-  function zeroFill( number, width ) {
+  function zeroFill(number, width) {
     width -= number.toString().length;
-    if ( width > 0 ) {
-      return new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number;
+    if (width > 0) {
+      return new Array(width + (/\./.test(number) ? 2 : 1)).join('0') + number;
     }
     return number + ""; // always return a string
   }
@@ -53,13 +53,13 @@ $( function() {
       min: 0,
       max: 12*(1989-1962),
       step: 1,
-      slide: function( event, ui ) {
+      slide: function(event, ui) {
         var numvisible = filterCasualties().size();
       }
     });
 
   animateCasualties = function() {
-    d3.timer( function(t) {
+    d3.timer(function(t) {
       var dt,numsteps;
       dt = 50;
       numsteps = 27*12;
@@ -152,20 +152,24 @@ $( function() {
     }
     filterCasualties();
     var names = d3.select(".namescontainer > g[stateid='" + stateid + "'] > .countynames[countyid='" + countyid + "']");
-    t.push( names[0] );
+    t.push(names[0]);
     c = path.centroid(d);
     c.x = c[0];
     c.y = c[1];
     t.each(function() { toBottomOfParent(this); });
     t.attr("zoom", (isZoomed(this) ? 1 : zoomfactor))
-    .each( function(d) {
+    .each(function(d) {
       d3.select(this).selectAll("circle")
         .attr("zoom", function() { return isZoomed(this) ? 1 : zoomfactor })
         .transition()
         .duration(500)
-        // .attr("r", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
-        //   return d3.select(this).attr("r") * (isZoomed(this) ? 1/zoomfactor : zoomfactor);
-        // });
+        .attr("r", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
+          return d3.select(this).attr("r") * (isZoomed(this) ? 2/zoomfactor : zoomfactor/2);
+        })
+        .style("stroke-width", function(d) { // make circle fill size zoom-invariant (stroke width still varies?)
+          return parseFloat(d3.select(this).style("stroke-width").replace("px", "")) * (isZoomed(this) ? 2/zoomfactor : zoomfactor/2) + "px";
+        });
+
     })
     .transition()
     .duration(500)
@@ -176,14 +180,13 @@ $( function() {
     // TODO: circles get larger with this scaling, but this is not terribly desireable (transition r to r/zoomfactor to compensate?)
     .attr("transform", "translate(" + (c.x) + "," + (c.y) +") " +
       "scale(" + t.attr("zoom") +") " +
-      "translate(" + [-c.x,-c.y].join(',') + ") "
-    )
+      "translate(" + [-c.x,-c.y].join(',') + ") ")
     //
     // z-index cleanup - after a zoom finishes, all circles should be on top
     // might also be helpful to use Node.insertBefore() ?
     // TODO: this can be interrupted, but there should only ever be one zoomed county anyway!
     .each("end", function() { if (!isZoomed(this)) {
-      d3.selectAll(".names").each( function() { toBottomOfParent(this);} );
+      d3.selectAll(".names").each(function() { toBottomOfParent(this);});
     }})
   }
 
@@ -205,10 +208,8 @@ $( function() {
       .on('mouseover', function(d,i) {
         toBottomOfParent(this.parentNode);
         var countyid = this.parentNode.getAttribute("countyid");
-        d3.select("#curr").text(
-          d.properties.NAME + ", casualties: " +
-          d3.selectAll(".countynames[countyid='" + countyid + "'] > circle").size()
-        )
+        d3.select("#curr").text(d.properties.NAME + ", casualties: " +
+          d3.selectAll(".countynames[countyid='" + countyid + "'] > circle").size())
       })
       .on('mouseout', function(d,i) { d3.select("#curr").text(defaulttext) })
     if(!--remaining) {
@@ -266,7 +267,7 @@ $( function() {
   });
 
   function setCasualtyImg(cas) {
-    var url = ( cas.hasphoto && cas.photo ? cas.photo : defaultImage );
+    var url = (cas.hasphoto && cas.photo ? cas.photo : defaultImage);
     setImg(url);
   }
   function setImg(url) {
@@ -275,38 +276,59 @@ $( function() {
       .attr("src", "img/" + url);
   }
 
-  function hoverCircle(d){
-    var e,casbox, casdate;
-    d3.select("#curr")
-      .text(d.lname + ", " + d.fname +
-        "  ; HOMETOWN: " + d.hometown +
-        " (county: " + d.county + " )"
-      );
-    e = d3.event;
-    // clearTimeout(casboxTimeout);
-    casbox = d3.select(".casbox")
-    //   .style({ display: "inline" })
-    //   .transition()
-    //   .duration(500)
-    //   .style({
-    //     left: e.clientX + 30 + "px",
-    //     top: e.clientY + "px",
-    //     opacity: 1.0
-    //   });
+  function clickCircle(d){
+    var sel;
+    // d3.select("#curr")
+    //   .text(d.lname + ", " + d.fname +
+    //     "  ; HOMETOWN: " + d.hometown +
+    //     " (county: " + d.county + ")");
 
+    sel = d3.select("#casualtyinfo").selectAll("div")
+      .data(d.values, function(c, i) {
+        if (c && c.recid) {
+          return c.recid
+        }
+      });
+    sel.exit()
+      .remove()
+    sel.enter()
+      .append(casualtyInfo)
     d3.selectAll(".casvitals").style("visibility", "visible");
-    casdate = d.casdate !== null ? (new Date(d.casdate)).toLocaleDateString("en-us") : "Casualty date unknown";
-    casbox.select("#casname").text(function(){ return d.fname + ' ' + d.lname; });
-    setCasualtyImg(d);
-    casbox.select("#casdate").text(casdate);
-    casbox.select("#hometown").text(function(){ return d.hometown });
   }
 
-  function clickCircle(d) {
+  function casualtyInfo(cas) {
+    var listel = document.createElement("div");
+    listel.classList.add("row");
+    listel.classList.add("casrow");
+
+    var vitalscont = document.createElement("div");
+    vitalscont.classList.add("col-xs-6");
+
+    var namecont = document.createElement("div");
+    namecont.id = "name" + cas.recid;
+    namecont.classList.add("casname")
+    namecont.classList.add("row");
+    namecont.textContent = cas.fname + " " + cas.lname;
+
+    var piccont = document.createElement("img");
+    piccont.id = "pic" + cas.recid;
+    piccont.classList.add("caspic");
+    piccont.classList.add("col-xs-6");
+    piccont.src = 'img/' + cas.photo;
+
+    vitalscont.appendChild(namecont);
+    listel.appendChild(vitalscont);
+    listel.appendChild(piccont);
+
+    return listel;
   }
 
-  function createCircle(d) {
-    var d = d.values[0];
+  function hoverCircle(d) {
+    console.log(d.key + " has " + d.values.length + " casualties");
+  }
+
+  function createCircle(towndata) {
+    var d = towndata.values[0];
     // Using createElementNS is necessary, <circle> is not meaningful in the HTML namespace
     elem = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "circle"))
       .classed("name", true)
@@ -320,10 +342,11 @@ $( function() {
       // .classed("badloc", function() { return d.badloc })
       .attr("recid", d.recid)
       .attr("zoom", 1)
+      .attr("fill", "rgb(26, 228, 66)")
       .attr("r", 3)
       .attr("transform", function() {
         var lat,lon;
-        if ( d.badloc && d.longitude == -78 ) {
+        if (d.badloc && d.longitude == -78) {
           d.longitude = -78.69971 + Math.random(); // randomly spread out the badlocs that are other states/etc.
           d.latitude = 39 - Math.random();
         }
@@ -336,7 +359,7 @@ $( function() {
       .on("mouseover",hoverCircle)
       .on("mouseout", function(d,i) {
         d3.select("#curr").text(defaulttext);
-        // casboxTimeout = setTimeout( function() {
+        // casboxTimeout = setTimeout(function() {
         //   d3.select(".casbox")
         //     .transition()
         //     .duration(500)
@@ -360,7 +383,7 @@ $( function() {
       .enter()
       .append("g")
       .attr("stateid", function(d,i) { return d.key; })
-      .each( function(d,i) {
+      .each(function(d,i) {
         var stateid = d.key;
         d3.select(this)
         .selectAll(".countynames")
@@ -369,7 +392,7 @@ $( function() {
         .append("g")
         .classed("countynames", true)
         .attr("countyid", function(d) { return zeroFill(d.key,3) })
-        .each( function(d,i) {
+        .each(function(d,i) {
           d3.select(this)
           .selectAll(".names")
           .data(d.values)

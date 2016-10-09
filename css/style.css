@@ -29,6 +29,7 @@ path:hover {
 
   background-color: #99ad97;
   height: 100%;
+  overflow-y: scroll;
   /*padding-bottom: 20px;
   left: 0px;
   bottom: 0px;*/
@@ -88,7 +89,7 @@ path:hover {
 }
 
 .name {
-  fill: #1ae442;
+  /*fill: #1ae442;*/
   stroke: black;
   visibility: hidden;
 }
@@ -136,16 +137,20 @@ path:hover {
   left: 0;
 }
 
-#caspic {
-  padding-top: 15px;
-  padding-bottom: 15px;
+.casname {
+  margin: 10% auto;
 }
 
-#caspic > img {
+.casrow {
+  padding-bottom: 5px;
+}
+
+.caspic {
   display: block;
-  height: auto;
+  max-height: 150px;
   margin: 0 auto;
-  width: 50%;
+  max-width: 150px;
+  width: auto;
 }
 
 #curr {
