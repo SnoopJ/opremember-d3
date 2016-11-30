@@ -66,6 +66,10 @@ if not DOPHOTOS:
 tree = ET.parse('./ormvmasterfile.xml')
 indb = tree.getroot()
 
+# kludge
+if indb.tag is not 'dataroot':
+    indb = indb.find("dataroot")
+
 # outdb = OrderedDict()
 outdb = []
 
@@ -192,6 +196,23 @@ def fixRecLocation(newlocname, rec):
     setLocation(newloc, rec)
 
 
+def getCountyID(rec):
+    recconfirmed = False
+    ret = -1
+    for ctyid, r in ctyregs.iteritems():
+        # print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
+        if r.search(rec.county) is not None:
+            if recconfirmed:
+                print("Tried to confirm twice!")
+                raise SystemExit
+            ret = ctyid
+            print("Confirmed countyid %s" % ctyid)
+            recconfirmed = True
+    return ret
+    #if not recconfirmed:
+    #    print("Could not confirm countyid for %s (%i), setting ctyid to unknown!" % (rec.fname + ' ' + rec.lname, rec.recid))
+    #    raise SystemExit
+
 
 def doRecs(db, idx=-1):
     # for rec in indb:
@@ -209,7 +230,6 @@ def doRecs(db, idx=-1):
         rec.lname = getTag(rec, "LNAME")
         rec.photo = getPhoto(rec)
         rec.county = getTag(rec, "COUNTY")
-
         rec.casdate = getTag(rec, "CASDATE")
 
         if rec.casdate is not None and rec.casdate.isdigit():
@@ -219,19 +239,7 @@ def doRecs(db, idx=-1):
         else:
             rec.casdate = None
 
-        recconfirmed = False
-        for ctyid, r in ctyregs.iteritems():
-            # print("Searching for county resolution of \"%s\", trying against \"%s\""%(rec.county,counties[ctyid]))
-            if r.search(rec.county) is not None:
-                if recconfirmed:
-                    print("Tried to confirm twice!")
-                    raise SystemExit
-                rec.countyid = ctyid
-                print("Confirmed countyid %s" % ctyid)
-                recconfirmed = True
-        if not recconfirmed:
-            print("Could not confirm!")
-            raise SystemExit
+        rec.countyid = getCountyID(rec)
 
         rec.hometown = getTag(rec, "HOME")
         if rec.hometown is None:
