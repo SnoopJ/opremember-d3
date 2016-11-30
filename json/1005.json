@@ -1,1 +1,1 @@
-{"recid": 1005, "fname": "JOHN DAVIS", "lname": "WILLINGHAM", "hasphoto": false, "photo": null, "hometown": "SALISBURY", "latitude": 38.36067, "longitude": -75.59937, "county": "WICOMICO", "countyid": 45, "stateid": "24", "badloc": false, "casdate": -60220800000.0}
+{"recid": 1005, "fname": "JOHN DAVIS", "lname": "WILLINGHAM", "hasphoto": true, "photo": "1005.JPG", "hometown": "SALISBURY", "latitude": 38.36067, "longitude": -75.59937, "county": "WICOMICO", "countyid": 45, "stateid": "24", "badloc": false, "casdate": -60220800000.0}

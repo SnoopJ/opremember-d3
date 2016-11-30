@@ -1,1 +1,1 @@
-{"recid": 599, "fname": "ROBERT LEE", "lname": "KING", "hasphoto": false, "photo": null, "hometown": "PRINCE FREDERICK", "latitude": 38.5404, "longitude": -76.5844, "county": "CALVERT", "countyid": 9, "stateid": "24", "badloc": false, "casdate": 29030400000.0}
+{"recid": 599, "fname": "ROBERT LEE", "lname": "KING", "hasphoto": true, "photo": "599.jpg", "hometown": "PRINCE FREDERICK", "latitude": 38.5404, "longitude": -76.5844, "county": "CALVERT", "countyid": 9, "stateid": "24", "badloc": false, "casdate": 29030400000.0}

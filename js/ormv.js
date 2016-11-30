@@ -310,6 +310,12 @@ $(function() {
     namecont.classList.add("row");
     namecont.textContent = cas.fname + " " + cas.lname;
 
+    //var piclink = document.createElement("a");
+    //piccont.id = "pic" + cas.recid;
+    //piclink.classList.add("col-xs-6");
+    //piclink.href = 'img/' + cas.photo;
+    //piclink.target = "_blank";
+
     var piccont = document.createElement("img");
     piccont.id = "pic" + cas.recid;
     piccont.classList.add("caspic");

@@ -1,1 +1,1 @@
-{"recid": 993, "fname": "ARSELL", "lname": "WHITLEY", "hasphoto": false, "photo": null, "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "stateid": "24", "badloc": false, "casdate": -79056000000.0}
+{"recid": 993, "fname": "ARSELL", "lname": "WHITLEY", "hasphoto": true, "photo": "993.jpg", "hometown": "BALTIMORE", "latitude": 39.29038, "longitude": -76.61219, "county": "BALTIMORE CITY", "countyid": 510, "stateid": "24", "badloc": false, "casdate": -79056000000.0}
